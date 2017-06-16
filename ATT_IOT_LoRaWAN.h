@@ -93,7 +93,7 @@ class ATTDevice
 		
 		> Even if this function returns true, this does not yet mean you are already in contact with a base station. It only means that the modem was succesfully configured with the provided parameters and an abp request has been made. The library will however automatically try to reconnect using abp mode when there was a problem with the connection.
 		*/
-		bool Connect(const uint8_t* devAddress, const uint8_t* appKey, const uint8_t*  nwksKey, bool adr = true);
+		bool InitABP(const uint8_t* devAddress, const uint8_t* appKey, const uint8_t*  nwksKey, bool adr = true);
 		
 		
 		/**
@@ -109,7 +109,7 @@ class ATTDevice
 		
 		returns: true when the packet has been buffered, or the transmission has begun. Use processQueue or ProcessQueuePopFailed to get the result of the transmission.
 		*/
-		bool Send(void* data, unsigned char size, bool ack = true);
+		bool AddToQueue(void* data, unsigned char size, bool ack = true);
 		
 		/**
 		Instructs the system to process any incomming responses from the base station and to try and send a message from it's queue,
@@ -124,12 +124,6 @@ class ATTDevice
 		   will try to resend the payload.
 		*/
 		int ProcessQueue();
-		
-		/**
-		Calls processQueue() and removes the item from the queue if the send failed. 
-		For return values, see ProcessQueue
-		*/
-		int ProcessQueuePopFailed();
 		
 		/**
 		removes the current message at the front of the queue, if there is still data in the buffer.
@@ -171,14 +165,14 @@ class ATTDevice
 		void Push(void* data, unsigned char size, bool ack = true);
 		
 		//send data to modem for transmission
-		void StartSend(void* data, unsigned char size, bool ack);
+		void SendASync(void* data, unsigned char size, bool ack);
 		
 		//sends the payload at the front of the queue, if there is any and if it's within the allowed time frame.
 		//returns true if there is still more work to be done. False if there was no more front to be sent
 		bool trySendFront();
 		
 		//used for setting up initial connection and trying to reconnect.
-		bool internalConnect();
+		bool CheckInitStatus();
 };
 
 #endif

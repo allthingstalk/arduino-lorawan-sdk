@@ -38,7 +38,6 @@
 
 #define SERIAL_BAUD 57600
 
-int DigitalSensor = 20;                                        // digital sensor is connected to pin D20/21
 MicrochipLoRaModem Modem(&Serial1, &SerialUSB);
 ATTDevice Device(&Modem, &SerialUSB);
 
@@ -55,7 +54,6 @@ DemoData data;
 
 void setup() 
 {
-  //pinMode(DigitalSensor, INPUT);					            // initialize the digital pin as an input.          
   digitalWrite(ENABLE_PIN_IO, HIGH);
   delay(3000);
   
@@ -63,7 +61,7 @@ void setup()
   Serial1.begin(Modem.getDefaultBaudRate());					// init the baud rate of the serial connection so that it's ok for the modem
   while((!SerialUSB) && (millis()) < 30000){}            //wait until serial bus is available, so we get the correct logging on screen. If no serial, then blocks for 2 seconds before run
   
-  while(!Device.Connect(DEV_ADDR, APPSKEY, NWKSKEY));
+  while(!Device.InitABP(DEV_ADDR, APPSKEY, NWKSKEY));
   SerialUSB.println("Ready to send data");
 }
 
@@ -76,9 +74,8 @@ void loop()
 	data.value1 = counter;
 	data.value2 = counter;
 	data.value3 = counter;
-	if (sendNextAt < millis()){
-		//Modem.Send(&data, sizeof(data));					//blocking, when this is used, don't call ProcessQueue
-		bool sendSuccess = Device.Send(&data, sizeof(data));				//non blocking
+	if(sendNextAt < millis()){
+		bool sendSuccess = Device.AddToQueue(&data, sizeof(data));  // non blocking
     if(sendSuccess == false){
       SerialUSB.println("discarding data");
     }
@@ -87,8 +84,8 @@ void loop()
 	}
 	sendState = Device.ProcessQueue();
 	if(sendState == -1){
-     SerialUSB.println("failed to send data, removing from queue");
-     Device.Pop();
+    SerialUSB.println("failed to send data, removing from queue");
+    Device.Pop();
   }
 }
 

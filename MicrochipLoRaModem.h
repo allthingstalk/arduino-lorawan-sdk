@@ -125,20 +125,6 @@ class MicrochipLoRaModem: public LoRaModem
 		*/
 		bool Start();
 		
-		/** send a data packet to the NSP.
-		
-		This operation is performed synchronically, so if ack is requested, then the function will block untill the base station has responded
-		or the time out has expired.
-		
-		parameters:
-		- data: the byte array or pointer to a structure that needs to be sent.
-		- size: the nr of bytes in the data block.
-		- ack: when true, an acknowledge is request fromo the base station (default), otherwise no acknowledge is waited for.
-		
-		returns: true upon success.
-		*/
-		bool Send(void* packet, unsigned char size, bool ack = true);
-		
 		/** start the send process, but return before everything is done.
 		
 		This operation is performed asynchronically, so if an ack is requested, then the operation is not yet complete when this function
@@ -179,11 +165,6 @@ class MicrochipLoRaModem: public LoRaModem
 		*/
 		int GetModemId();
 		
-		
-		/**prints all configuration params (radio and mac) to the monitor
-		*/
-		void PrintModemConfig();
-		
 		#ifdef ENABLE_SLEEP
 		/**put the modem in sleep mode for 3 days (use WakeUp if you want to send something earlier)
 		*/
@@ -192,6 +173,14 @@ class MicrochipLoRaModem: public LoRaModem
 		/**wakes up the device after it has been put the sleep.
 		*/
 		void WakeUp();
+    
+    //retrieves the specified parameter from the MicrochipLoRaModem
+    char* getSysParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);    
+    //retrieves the specified parameter from the radio
+    char* getRadioParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
+    //retrieves the specified parameter from the radio
+    char* getMacParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
+    
 		#endif
 	private:
 		Stream *_monitor;
@@ -225,10 +214,6 @@ class MicrochipLoRaModem: public LoRaModem
 		void macSendCommand(const char* type, const unsigned char* payload, unsigned char size);
 		//convert the text value for spreading factor into a number between 0 and 6
 		int sfToIndex(char* value);
-		//retrieves the specified parameter from the radio
-		char* getRadioParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
-		//retrieves the specified parameter from the radio
-		char* getMacParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
 		
 		unsigned char macTransmitGetResponse();
 		//checks the current input string against the param. Returns true if they match.

@@ -173,34 +173,18 @@ void MicrochipLoRaModem::WakeUp()
 }
 #endif
 
-bool MicrochipLoRaModem::Send(void* packet, unsigned char size, bool ack)
-{
-	LoRaModem::Send(packet, size, ack);
-	unsigned char result;
-	if(ack == true)
-		result = macTransmit(STR_CONFIRMED, (unsigned char*)packet, size) == NoError;
-	else
-		result = macTransmit(STR_UNCONFIRMED, (unsigned char*)packet, size) == NoError;
-
-	if(result)
-		PRINTLN("Successfully sent packet")
-	else
-		PRINTLN("Failed to send packet")
-	return result;
-}
-
-//send a data packet to the server
+// send a data packet to the server
 bool MicrochipLoRaModem::SendAsync(void* packet, unsigned char size, bool ack)
 {
-	if(LoRaModem::Send(packet, size, ack)){									//check size, copy to buffer, show hex on debug serial. If this is not ok, don't try to send.
+	if(LoRaModem::Send(packet, size, ack)){  // check size, copy to buffer, show hex on debug serial. If this is not ok, don't try to send.
 		sendState = SENDSTATE_TRANSMITCOMMAND;
 		if(ack == true)
 			macSendCommand(STR_CONFIRMED, (unsigned char*)packet, size);
 		else
 			macSendCommand(STR_UNCONFIRMED, (unsigned char*)packet, size);
 		sendState = SENDSTATE_EXPECTOK;
-		_triedReadOk = false;												//we start looking for 'ok', we have never tried to read the response yet. This is used to make certain we try to read a response at least 1 time before timing out.			
-		asyncOperationStart = millis();										//so we know when the async operation started.
+		_triedReadOk = false;  // we start looking for 'ok', we have never tried to read the response yet. This is used to make certain we try to read a response at least 1 time before timing out.			
+		asyncOperationStart = millis();  // so we know when the async operation started.
 		return true;
 	}
 	sendState = SENDSTATE_DONE;
@@ -675,6 +659,32 @@ int MicrochipLoRaModem::GetParam(instrumentationParam param)
 	}
 }
 
+char* MicrochipLoRaModem::getSysParam(const char* paramName, unsigned short timeout)
+{
+	#ifdef FULLDEBUG
+	PRINT("[getMacParam] ");
+	PRINT(paramName);
+	#endif
+
+	_stream->print(STR_CMD_GET_SYS);
+	_stream->print(paramName);
+	_stream->print(CRLF);
+
+	unsigned long start = millis();
+	while (millis() < start + timeout)
+	{
+		if (readLn() > 0)
+		{
+			#ifdef FULLDEBUG
+			PRINT(" = ");
+			PRINTLN(this->inputBuffer);
+			#endif
+			return this->inputBuffer;
+		}
+	}
+	return NULL;  // no repsonse, so return empty string
+}
+
 char* MicrochipLoRaModem::getMacParam(const char* paramName, unsigned short timeout)
 {
 	#ifdef FULLDEBUG	
@@ -725,207 +735,6 @@ char* MicrochipLoRaModem::getRadioParam(const char* paramName, unsigned short ti
 		}
 	}
 	return NULL;						//no repsonse, so return empty string
-}
-
-//prints all configuration params (radio and mac) to the monitor
-void MicrochipLoRaModem::PrintModemConfig()
-{
-	char* res = getRadioParam("bt");
-	PRINT("bt = ") PRINTLN(res);
-	res = getRadioParam("mod");
-	PRINT("mod = ") PRINTLN(res);
-	res = getRadioParam("freq");
-	PRINT("freq = ") PRINTLN(res);
-	res = getRadioParam("sf");
-	PRINT("sf = ") PRINTLN(res);
-	res = getRadioParam("afcbw");
-	PRINT("afcbw = ") PRINTLN(res);
-	res = getRadioParam("rxbw");
-	PRINT("rxbw = ") PRINTLN(res);
-	res = getRadioParam("bitrate");
-	PRINT("bitrate = ") PRINTLN(res);
-	res = getRadioParam("fdev");
-	PRINT("fdev = ") PRINTLN(res);
-	res = getRadioParam("prlen");
-	PRINT("prlen = ") PRINTLN(res);
-	res = getRadioParam("crc");
-	PRINT("crc = ") PRINTLN(res);
-	res = getRadioParam("iqi");
-	PRINT("iqi = ") PRINTLN(res);
-	res = getRadioParam("cr");
-	PRINT("cr = ") PRINTLN(res);
-	res = getRadioParam("wdt");
-	PRINT("wdt = ") PRINTLN(res);
-	res = getRadioParam("bw");
-	PRINT("bw = ") PRINTLN(res);
-	res = getRadioParam("snr");
-	PRINT("snr = ") PRINTLN(res);
-
-	res = getMacParam("devaddr");
-	PRINT("devaddr = ") PRINTLN(res);
-	res = getMacParam("deveui");
-	PRINT("deveui = ") PRINTLN(res);
-	res = getMacParam("appeui");
-	PRINT("appeui = ") PRINTLN(res);
-	res = getMacParam("dr");
-	PRINT("dr = ") PRINTLN(res);
-	res = getMacParam("band");
-	PRINT("band = ") PRINTLN(res);
-	res = getMacParam("pwridx");
-	PRINT("pwridx = ") PRINTLN(res);
-	res = getMacParam("adr");
-	PRINT("adr = ") PRINTLN(res);
-	res = getMacParam("retx");
-	PRINT("retx = ") PRINTLN(res);
-	res = getMacParam("rxdelay1");
-	PRINT("rxdelay1 = ") PRINTLN(res);
-	res = getMacParam("rxdelay2");
-	PRINT("rxdelay2 = ") PRINTLN(res);
-	res = getMacParam("ar");
-	PRINT("ar = ") PRINTLN(res);
-	res = getMacParam("rx2 868");
-	PRINT("rx2 = ") PRINTLN(res);
-	res = getMacParam("dcycleps");
-	PRINT("dcycleps = ") PRINTLN(res);
-	res = getMacParam("mrgn");
-	PRINT("mrgn = ") PRINTLN(res);
-	res = getMacParam("gwnb");
-	PRINT("gwnb = ") PRINTLN(res);
-	res = getMacParam("status");
-	PRINT("status = ") PRINTLN(res);
-	
-	res = getMacParam("ch freq 0");
-	PRINT("ch freq 0 = ") PRINTLN(res);
-	res = getMacParam("ch freq 1");
-	PRINT("ch freq 1 = ") PRINTLN(res);
-	res = getMacParam("ch freq 2");
-	PRINT("ch freq 2 = ") PRINTLN(res);
-	res = getMacParam("ch freq 3");
-	PRINT("ch freq 3 = ") PRINTLN(res);
-	res = getMacParam("ch freq 4");
-	PRINT("ch freq 4 = ") PRINTLN(res);
-	res = getMacParam("ch freq 5");
-	PRINT("ch freq 5 = ") PRINTLN(res);
-	res = getMacParam("ch freq 6");
-	PRINT("ch freq 6 = ") PRINTLN(res);
-	res = getMacParam("ch freq 7");
-	PRINT("ch freq 7 = ") PRINTLN(res);
-	res = getMacParam("ch freq 8");
-	PRINT("ch freq 8 = ") PRINTLN(res);
-	res = getMacParam("ch freq 9");
-	PRINT("ch freq 9 = ") PRINTLN(res);
-	res = getMacParam("ch freq 10");
-	PRINT("ch freq 10 = ") PRINTLN(res);
-	res = getMacParam("ch freq 11");
-	PRINT("ch freq 11 = ") PRINTLN(res);
-	res = getMacParam("ch freq 12");
-	PRINT("ch freq 12 = ") PRINTLN(res);
-	res = getMacParam("ch freq 13");
-	PRINT("ch freq 13 = ") PRINTLN(res);
-	res = getMacParam("ch freq 14");
-	PRINT("ch freq 14 = ") PRINTLN(res);
-	res = getMacParam("ch freq 15");
-	PRINT("ch freq 15 = ") PRINTLN(res);
-	
-	res = getMacParam("ch dcycle 0");
-	PRINT("ch dcycle 0 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 1");
-	PRINT("ch dcycle 1 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 2");
-	PRINT("ch dcycle 2 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 3");
-	PRINT("ch dcycle 3 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 4");
-	PRINT("ch dcycle 4 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 5");
-	PRINT("ch dcycle 5 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 6");
-	PRINT("ch dcycle 6 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 7");
-	PRINT("ch dcycle 7 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 8");
-	PRINT("ch dcycle 8 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 9");
-	PRINT("ch dcycle 9 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 10");
-	PRINT("ch dcycle 10 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 11");
-	PRINT("ch dcycle 11 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 12");
-	PRINT("ch dcycle 12 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 13");
-	PRINT("ch dcycle 13 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 14");
-	PRINT("ch dcycle 14 = ") PRINTLN(res);
-	res = getMacParam("ch dcycle 15");
-	PRINT("ch dcycle 15 = ") PRINTLN(res);
-	
-	res = getMacParam("ch drrange 0");
-	PRINT("ch drrange 0 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 1");
-	PRINT("ch drrange 1 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 2");
-	PRINT("ch drrange 2 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 3");
-	PRINT("ch drrange 3 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 4");
-	PRINT("ch drrange 4 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 5");
-	PRINT("ch drrange 5 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 6");
-	PRINT("ch drrange 6 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 7");
-	PRINT("ch drrange 7 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 8");
-	PRINT("ch drrange 8 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 9");
-	PRINT("ch drrange 9 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 10");
-	PRINT("ch drrange 10 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 11");
-	PRINT("ch drrange 11 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 12");
-	PRINT("ch drrange 12 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 13");
-	PRINT("ch drrange 13 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 14");
-	PRINT("ch drrange 14 = ") PRINTLN(res);
-	res = getMacParam("ch drrange 15");
-	PRINT("ch drrange 15 = ") PRINTLN(res);
-	
-	res = getMacParam("ch status 0");
-	PRINT("ch status 0 = ") PRINTLN(res);
-	res = getMacParam("ch status 1");
-	PRINT("ch status 1 = ") PRINTLN(res);
-	res = getMacParam("ch status 2");
-	PRINT("ch status 2 = ") PRINTLN(res);
-	res = getMacParam("ch status 3");
-	PRINT("ch status 3 = ") PRINTLN(res);
-	res = getMacParam("ch status 4");
-	PRINT("ch status 4 = ") PRINTLN(res);
-	res = getMacParam("ch status 5");
-	PRINT("ch status 5 = ") PRINTLN(res);
-	res = getMacParam("ch status 6");
-	PRINT("ch status 6 = ") PRINTLN(res);
-	res = getMacParam("ch status 7");
-	PRINT("ch status 7 = ") PRINTLN(res);
-	res = getMacParam("ch status 8");
-	PRINT("ch status 8 = ") PRINTLN(res);
-	res = getMacParam("ch status 9");
-	PRINT("ch status 9 = ") PRINTLN(res);
-	res = getMacParam("ch status 10");
-	PRINT("ch status 10 = ") PRINTLN(res);
-	res = getMacParam("ch status 11");
-	PRINT("ch status 11 = ") PRINTLN(res);
-	res = getMacParam("ch status 12");
-	PRINT("ch status 12 = ") PRINTLN(res);
-	res = getMacParam("ch status 13");
-	PRINT("ch status 13 = ") PRINTLN(res);
-	res = getMacParam("ch status 14");
-	PRINT("ch status 14 = ") PRINTLN(res);
-	res = getMacParam("ch status 15");
-	PRINT("ch status 15 = ") PRINTLN(res);
-	
 }
 
 //convert the text value for spreading factor into a number between 0 and 6

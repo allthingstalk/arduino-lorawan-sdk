@@ -34,6 +34,7 @@
 #define STR_DEVICE_TYPE_EU "RN2483"
 #define STR_DEVICE_TYPE_US "RN2903"
 
+#define STR_CMD_GET_SYS "sys get "
 #define STR_CMD_GET_MAC "mac get "
 #define STR_CMD_GET_RADIO "radio get "
 #define STR_CMD_SET "mac set "
