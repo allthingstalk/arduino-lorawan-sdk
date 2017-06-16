@@ -38,8 +38,16 @@
 
 #define SERIAL_BAUD 57600
 
-MicrochipLoRaModem Modem(&Serial1, &SerialUSB);
-ATTDevice Device(&Modem, &SerialUSB);
+// Sodaq ONE
+#define debugSerial SerialUSB
+#define loraSerial Serial1
+
+// Sodaq Mbili
+//#define debugSerial Serial
+//#define loraSerial Serial1
+
+MicrochipLoRaModem Modem(&loraSerial, &debugSerial);
+ATTDevice Device(&Modem, &debugSerial);
 
 struct DemoData
 {
@@ -49,20 +57,19 @@ struct DemoData
 		
 };
 
-
 DemoData data;
 
 void setup() 
 {
-  digitalWrite(ENABLE_PIN_IO, HIGH);
+  //digitalWrite(ENABLE_PIN_IO, HIGH);
   delay(3000);
   
-  SerialUSB.begin(SERIAL_BAUD);
-  Serial1.begin(Modem.getDefaultBaudRate());					// init the baud rate of the serial connection so that it's ok for the modem
-  while((!SerialUSB) && (millis()) < 30000){}            //wait until serial bus is available, so we get the correct logging on screen. If no serial, then blocks for 2 seconds before run
+  debugSerial.begin(SERIAL_BAUD);
+  loraSerial.begin(Modem.getDefaultBaudRate());					// init the baud rate of the serial connection so that it's ok for the modem
+  while((!debugSerial) && (millis()) < 30000){}            //wait until serial bus is available, so we get the correct logging on screen. If no serial, then blocks for 2 seconds before run
   
   while(!Device.InitABP(DEV_ADDR, APPSKEY, NWKSKEY));
-  SerialUSB.println("Ready to send data");
+  debugSerial.println("Ready to send data");
 }
 
 int counter = 0;
@@ -77,17 +84,14 @@ void loop()
 	if(sendNextAt < millis()){
 		bool sendSuccess = Device.AddToQueue(&data, sizeof(data));  // non blocking
     if(sendSuccess == false){
-      SerialUSB.println("discarding data");
+      debugSerial.println("discarding data");
     }
 		counter++;
 		sendNextAt = millis() + 10000;
 	}
 	sendState = Device.ProcessQueue();
 	if(sendState == -1){
-    SerialUSB.println("failed to send data, removing from queue");
+    debugSerial.println("failed to send data, removing from queue");
     Device.Pop();
   }
 }
-
-
-

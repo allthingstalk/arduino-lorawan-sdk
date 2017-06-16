@@ -23,48 +23,56 @@
 
 #define SERIAL_BAUD 57600
 
-MicrochipLoRaModem Modem(&Serial1, &SerialUSB);
+// Sodaq ONE
+#define debugSerial SerialUSB
+#define loraSerial Serial1
+
+// Sodaq Mbili
+//#define debugSerial Serial
+//#define loraSerial Serial1
+
+MicrochipLoRaModem Modem(&loraSerial, &debugSerial);
 
 void setup() 
 {
-  // Enable battery powered mode
-  pinMode(ENABLE_PIN_IO, OUTPUT);
-  digitalWrite(ENABLE_PIN_IO, HIGH);
-  
-  SerialUSB.begin(SERIAL_BAUD);                // set baud rate of the default serial debug connection
-  while((!SerialUSB) && (millis()) < 10000){}  // wait until serial bus is available, so we get the correct logging on screen. If no serial, then blocks for 2 seconds before run
+  debugSerial.begin(SERIAL_BAUD);                // set baud rate of the default serial debug connection
+  while((!debugSerial) && (millis()) < 10000){}  // wait until serial bus is available, so we get the correct logging on screen. If no serial, then blocks for 2 seconds before run
 
   Serial1.begin(Modem.getDefaultBaudRate());   // init the baud rate of the serial connection so that it's ok for the modem
-  while((!SerialUSB) && (millis()) < 30000){}  // wait until serial bus is available, so we get the correct logging on screen. If no serial, then blocks for 2 seconds before run
+  while((!debugSerial) && (millis()) < 30000){}  // wait until serial bus is available, so we get the correct logging on screen. If no serial, then blocks for 2 seconds before run
 
   delay(3000);
   printInstrumentation();
   
-  SerialUSB.println();
-  SerialUSB.println("-- Program end --");
+  debugSerial.println();
+  debugSerial.println("-- Program end --");
 }
 
 void printInstrumentation()
 {
-  SerialUSB.println("SYSTEM Parameters: ");
-  SerialUSB.println("----------------- ");
-  SerialUSB.print("Modem version: "); SerialUSB.println(Modem.getSysParam("ver"));
-  SerialUSB.println();
-  SerialUSB.println("MAC Parameters: ");
-  SerialUSB.println("--------------- ");
-  SerialUSB.print("DEVEUI: "); SerialUSB.println(Modem.getMacParam("deveui"));
-  SerialUSB.print("DEVADDR: "); SerialUSB.println(Modem.getMacParam("devaddr"));
-  SerialUSB.print("APPEUI: "); SerialUSB.println(Modem.getMacParam("appeuieui"));
-  SerialUSB.print("Freq Band (Mhz): "); SerialUSB.println(Modem.getMacParam("band"));
-  SerialUSB.print("Adaptive data rate: "); SerialUSB.println(Modem.getMacParam("adr"));
-  SerialUSB.print("Data rate for nex transmission: "); SerialUSB.println(Modem.getMacParam("dr"));
-  SerialUSB.print("Status: "); SerialUSB.println(Modem.getMacParam("status"));
+  debugSerial.println("SYSTEM Parameters: ");
+  debugSerial.println("----------------- ");
+  debugSerial.print("Modem version: "); debugSerial.println(Modem.getSysParam("ver"));
+  debugSerial.println();
+  debugSerial.println("MAC Parameters: ");
+  debugSerial.println("--------------- ");
+  debugSerial.print("DEVEUI: "); debugSerial.println(Modem.getMacParam("deveui"));
+  debugSerial.print("DEVADDR: "); debugSerial.println(Modem.getMacParam("devaddr"));
+  debugSerial.print("APPEUI: "); debugSerial.println(Modem.getMacParam("appeuieui"));
+  debugSerial.print("Freq Band (Mhz): "); debugSerial.println(Modem.getMacParam("band"));
+  debugSerial.print("Adaptive data rate: "); debugSerial.println(Modem.getMacParam("adr"));
+  debugSerial.print("Data rate for nex transmission: "); debugSerial.println(Modem.getMacParam("dr"));
+  debugSerial.print("Status: "); debugSerial.println(Modem.getMacParam("status"));
   
-  SerialUSB.println();
-  SerialUSB.println("RADIO Parameters: ");
-  SerialUSB.println("----------------- ");
+  debugSerial.println();
+  debugSerial.println("RADIO Parameters: ");
+  debugSerial.println("----------------- ");
   
-  SerialUSB.print("Spreading factor: "); SerialUSB.println(Modem.getRadioParam("sf"));
-  SerialUSB.print("Modulation Mode: "); SerialUSB.println(Modem.getRadioParam("mod"));
-  SerialUSB.print("Operating Frequency: "); SerialUSB.println(Modem.getRadioParam("freq"));
+  debugSerial.print("Spreading factor: "); debugSerial.println(Modem.getRadioParam("sf"));
+  debugSerial.print("Modulation Mode: "); debugSerial.println(Modem.getRadioParam("mod"));
+  debugSerial.print("Operating Frequency: "); debugSerial.println(Modem.getRadioParam("freq"));
+}
+
+void loop()
+{
 }
