@@ -1,19 +1,18 @@
 /*
-AllThingsTalk - Abstract class for LoRa modems
+  Copyright 2015-2017 AllThingsTalk
 
-   Copyright 2015-2016 AllThingsTalk
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
 
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-
-Original author: Jan Bogaerts (2015-2017)
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  
+  Abstract class for LoRa modems
+  Original author: Jan Bogaerts
 */
 
 #ifndef LoRaModem_h
@@ -27,13 +26,13 @@ Original author: Jan Bogaerts (2015-2017)
 
 #include <instrumentationParamEnum.h>
 
-#define SENDSTATE_TRANSMITCOMMAND 0				//3 states used to track async send status
+#define SENDSTATE_TRANSMITCOMMAND 0  // 3 states used to track async send status
 #define SENDSTATE_EXPECTOK 1
 #define SENDSTATE_GETRESPONSE 2
 #define SENDSTATE_DONE 3
 
-#define MAX_PAYLOAD_SIZE 222					//maximum allowed size for a payload
-#define SMALLEST_PAYLOAD_SIZE 51			 	//the payload size for the biggest sf
+#define MAX_PAYLOAD_SIZE 222  // maximum allowed size for a payload
+#define SMALLEST_PAYLOAD_SIZE 51  // the payload size for the biggest sf
 
 
 //callback signature for functions that process data coming from the NSP that were send to the device

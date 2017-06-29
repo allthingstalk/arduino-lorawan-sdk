@@ -1,19 +1,17 @@
 /*
-AllThingsTalk - LoRa Arduino library 
- 
-    Copyright 2015-2016 AllThingsTalk
+  Copyright 2015-2017 AllThingsTalk
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-
-Original author: Jan Bogaerts (2015-2017)
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  
+  Original author: Jan Bogaerts
 */
 
 #ifndef ATTDevice_h
@@ -146,7 +144,7 @@ class ATTDevice
 		inline unsigned char QueueCount(){ if(_back > _front) return _back - _front; else return _front - _back;};
 		
 	private:	
-	    unsigned long _minTimeBetweenSend;
+    unsigned long _minTimeBetweenSend;
 		unsigned long _minAllowedTimeBetweenSend;
 		unsigned long _lastTimeSent;							//the last time that a message was sent, so we can block sending if user calls send to quickly
 		Stream *_monitor;

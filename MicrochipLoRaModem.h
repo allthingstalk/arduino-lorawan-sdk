@@ -1,19 +1,18 @@
 /*
-AllThingsTalk - AllThingsTalk Communicate with Embit lora modems through binary AT commands
+  Copyright 2015-2017 AllThingsTalk
 
-   Copyright 2015-2016 AllThingsTalk
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
 
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-
-Original author: Jan Bogaerts (2015-2017)
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  
+  AllThingsTalk Communication with Embit lora modems through binary AT commands
+  Original author: Jan Bogaerts
 */
 
 #ifndef EmbitLoRaModem_h
@@ -30,7 +29,7 @@ Original author: Jan Bogaerts (2015-2017)
 
 #define DEFAULT_PAYLOAD_SIZE MAX_PAYLOAD_SIZE
 #define PORT 1
-#define DEFAULT_INPUT_BUFFER_SIZE 440				//needs to be big enough to store 220 hex byte values.
+#define DEFAULT_INPUT_BUFFER_SIZE 440  // needs to be big enough to store 220 hex byte values.
 #define DEFAULT_RECEIVED_PAYLOAD_BUFFER_SIZE MAX_PAYLOAD_SIZE
 #define DEFAULT_TIMEOUT 120
 #define RECEIVE_TIMEOUT 60000
@@ -75,8 +74,7 @@ class MicrochipLoRaModem: public LoRaModem
 		returns: an unsigned integer, representing the default baut rate.
 		*/
 		unsigned int getDefaultBaudRate();
-		
-		
+
 		/** stop the modem.
 		
 		returns: true upon success.
@@ -174,11 +172,11 @@ class MicrochipLoRaModem: public LoRaModem
 		*/
 		void WakeUp();
     
-    //retrieves the specified parameter from the MicrochipLoRaModem
+    // retrieves the specified parameter from the MicrochipLoRaModem
     char* getSysParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);    
-    //retrieves the specified parameter from the radio
+    // retrieves the specified parameter from the radio
     char* getRadioParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
-    //retrieves the specified parameter from the radio
+    // retrieves the specified parameter from the radio
     char* getMacParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
     
 		#endif
@@ -187,10 +185,10 @@ class MicrochipLoRaModem: public LoRaModem
 		SerialType* _stream;					//the stream to communicate with the lora modem.
 		char inputBuffer[DEFAULT_INPUT_BUFFER_SIZE + 1];
 		
-		///used to make certain that we at least try to read the modem response for 'ok' 1 time before timing out.
+		// used to make certain that we at least try to read the modem response for 'ok' 1 time before timing out.
 		bool _triedReadOk;
 		
-		//stores the starting time of the current async operation
+		// stores the starting time of the current async operation
 		unsigned long asyncOperationStart;
 		
 		unsigned char lookupMacTransmitError(const char* error);
@@ -198,25 +196,25 @@ class MicrochipLoRaModem: public LoRaModem
 		unsigned short readLn(char* buf, unsigned short bufferSize, unsigned short start = 0);
 		unsigned short readLn() { return readLn(this->inputBuffer, DEFAULT_INPUT_BUFFER_SIZE); };
 		bool expectOK();
-		//block until the string is found on input or timeout occured.
+		// block until the string is found on input or timeout occured.
 		bool expectString(const char* str, unsigned short timeout = DEFAULT_TIMEOUT);
-		//try to read the string on the input 1 time.
+		// try to read the string on the input 1 time.
 		char tryReadString(const char* str);
-		//try to read the string from teh input until found or untill timeout, do this async, so call many times
+		// try to read the string from teh input until found or untill timeout, do this async, so call many times
 		char expectStringAsync(const char* str, unsigned short timeout);
 		
 		bool setMacParam(const char* paramName, const unsigned char* paramValue, unsigned short size);
 		bool setMacParam(const char* paramName, unsigned char paramValue);
 		bool setMacParam(const char* paramName, const char* paramValue);
-		//send and wait for response
+		// send and wait for response
 		unsigned char macTransmit(const char* type, const unsigned char* payload, unsigned char size);
-		//send command
+		// send command
 		void macSendCommand(const char* type, const unsigned char* payload, unsigned char size);
-		//convert the text value for spreading factor into a number between 0 and 6
+		// convert the text value for spreading factor into a number between 0 and 6
 		int sfToIndex(char* value);
 		
 		unsigned char macTransmitGetResponse();
-		//checks the current input string against the param. Returns true if they match.
+		// checks the current input string against the param. Returns true if they match.
 		char checkInputInstring(const char* str);
 };
 
