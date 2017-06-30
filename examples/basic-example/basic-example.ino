@@ -85,6 +85,6 @@ void loop()
   {
     sendValue(counter);
     counter++;
-		sendNextAt = millis() + 900000;
+		sendNextAt = millis() + 900000;  // send every 15 minutes
 	}
 }

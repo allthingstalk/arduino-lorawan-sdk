@@ -22,10 +22,10 @@ ATTDevice::ATTDevice(LoRaModem* modem, Stream* monitor, bool autoCalMinTime, uns
 																									 _autoCalMinTime(autoCalMinTime), 
 																									 _minAllowedTimeBetweenSend(minTime)
 {
-	_modem = modem;
-	 _monitor = monitor;
-	_back = _front = _lastTimeSent = 0;
-	_sendFailed = false;
+  _modem = modem;
+  _monitor = monitor;
+  _back = _front = _lastTimeSent = 0;
+  _sendFailed = false;
 }
 
 //connect with the to the lora gateway
@@ -34,18 +34,49 @@ bool ATTDevice::InitABP(const uint8_t* devAddress, const uint8_t* appKey, const 
 	_devAddress = devAddress;
 	_appKey = appKey;
 	_nwksKey = nwksKey;
+  
+  if(!HasKeys())
+  {
+    PRINTLN("Program stopped");
+    while(1);
+  }
+  
 	_adr = adr;
 	PRINT("ATT lib version: "); PRINTLN(VERSION);
-	if(!_modem->Stop()){								//stop any previously running modems
+	if(!_modem->Stop()){  // stop any previously running modems
 		PRINTLN("can't communicate with modem: possible hardware issues");
 		return false;
 	}
 	return CheckInitStatus();
 }
 
+bool ATTDevice::HasKeys()
+{
+  // check if keys are filled in
+  int sum[3] = {0,0,0};
+  for(int i=0; i<sizeof(_devAddress); i++)
+  {
+    sum[0] += _devAddress[i];
+  }
+  for(int i=0; i<sizeof(_appKey); i++)
+  {
+    sum[1] += _appKey[i];
+  }
+  for(int i=0; i<sizeof(_nwksKey); i++)
+  {
+    sum[2] += _nwksKey[i];
+  }
+  if(sum[0] == 0 || sum[1] == 0 || sum[2] == 0){
+    PRINTLN("Please fill in DEV_ADDR, APPSKEY and NWKSKEY in your keys.h file");
+    return false;
+  }
+  
+  return true;
+}
+
 bool ATTDevice::CheckInitStatus()
 {
-	if (!_modem->SetLoRaWan(_adr)){						//switch to LoRaWan mode instead of peer to peer				
+	if (!_modem->SetLoRaWan(_adr)){  // switch to LoRaWAN mode instead of peer to peer				
 		PRINTLN("can't set adr: possible hardware issues?");
 		return false;
 	}
@@ -162,7 +193,7 @@ void ATTDevice::SendASync(void* packet, unsigned char size, bool ack)
 
 void ATTDevice::Pop()
 {
-	if(_front != _back){						//if both are the same there is nothing to pop
+	if(_front != _back){  // if both are the same there is nothing to pop
 		_front++;
 		if(_front >= QUEUESIZE)
 			_front = 0;
@@ -171,12 +202,14 @@ void ATTDevice::Pop()
 
 void ATTDevice::Push(void* data, unsigned char size, bool ack)
 {
+  /*
 	PRINTLN("buffering payload:")
 	for (unsigned char i = 0; i < size; i++) {
 		PRINT(((unsigned char*)data)[i], HEX) PRINT(" ")
 		//_modem->printHex(((unsigned char*)data)[i]);
 	}
 	PRINTLN();
+  */
 	
 	memcpy(_queue[_back], data, size);
 	_queue[_back][MAX_PAYLOAD_SIZE - 2] = size;

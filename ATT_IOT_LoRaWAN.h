@@ -146,10 +146,10 @@ class ATTDevice
 	private:	
     unsigned long _minTimeBetweenSend;
 		unsigned long _minAllowedTimeBetweenSend;
-		unsigned long _lastTimeSent;							//the last time that a message was sent, so we can block sending if user calls send to quickly
+		unsigned long _lastTimeSent;  // the last time that a message was sent, so we can block sending if user calls send to quickly
 		Stream *_monitor;
 		LoRaModem* _modem;
-		unsigned char _queue[QUEUESIZE][MAX_PAYLOAD_SIZE + 2];	//buffers the data 1 extra byte in the payload for the ack request flag (at end of array -> last byte) + 1 extra byte for the size, next to last byte
+		unsigned char _queue[QUEUESIZE][MAX_PAYLOAD_SIZE + 2];  // buffers the data 1 extra byte in the payload for the ack request flag (at end of array -> last byte) + 1 extra byte for the size, next to last byte
 		char _front;
 		char _back;
 		bool _sendFailed;
@@ -162,14 +162,17 @@ class ATTDevice
 		
 		void Push(void* data, unsigned char size, bool ack = true);
 		
-		//send data to modem for transmission
+		// send data to modem for transmission
 		void SendASync(void* data, unsigned char size, bool ack);
 		
-		//sends the payload at the front of the queue, if there is any and if it's within the allowed time frame.
-		//returns true if there is still more work to be done. False if there was no more front to be sent
+		// sends the payload at the front of the queue, if there is any and if it's within the allowed time frame.
+		// returns true if there is still more work to be done. False if there was no more front to be sent
 		bool trySendFront();
+    
+    // check if keys are filled in
+    bool HasKeys();
 		
-		//used for setting up initial connection and trying to reconnect.
+		// used for setting up initial connection and trying to reconnect.
 		bool CheckInitStatus();
 };
 
