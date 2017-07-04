@@ -25,7 +25,6 @@
  *  - MicroChip RN2483 LoRa module
  **/
 
-//#include <Wire.h>
 #include <ATT_IOT_LoRaWAN.h>
 #include "keys.h"
 #include <MicrochipLoRaModem.h>

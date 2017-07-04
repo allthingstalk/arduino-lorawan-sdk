@@ -185,9 +185,7 @@ void ATTDevice::SendASync(void* packet, unsigned char size, bool ack)
 		if(_autoCalMinTime)
 			_minTimeBetweenSend = minTime > _minAllowedTimeBetweenSend ? minTime : _minAllowedTimeBetweenSend;
 		PRINT("min delay until next send: ") PRINT(_minTimeBetweenSend) PRINTLN(" ms")
-	}
-	
-	
+	}	
 }
 
 
