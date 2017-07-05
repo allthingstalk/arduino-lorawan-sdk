@@ -5,7 +5,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +14,10 @@
 
 #include <ATT_IOT_LoRaWAN.h>
 #include "Utils.h"
-//#include <arduino.h>			// still required for the 'delay' function. use #ifdef for other platforms
+//#include <arduino.h>  // still required for the 'delay' function
 
 
-//create the object
+// create the object
 ATTDevice::ATTDevice(LoRaModem* modem, Stream* monitor, bool autoCalMinTime, unsigned int minTime):  _minTimeBetweenSend(minTime), 
 																									 _autoCalMinTime(autoCalMinTime), 
 																									 _minAllowedTimeBetweenSend(minTime)
@@ -28,7 +28,7 @@ ATTDevice::ATTDevice(LoRaModem* modem, Stream* monitor, bool autoCalMinTime, uns
   _sendFailed = false;
 }
 
-//connect with the to the lora gateway
+// connect with the to the lora gateway
 bool ATTDevice::InitABP(const uint8_t* devAddress, const uint8_t* appKey, const uint8_t* nwksKey, bool adr)
 {
 	_devAddress = devAddress;
@@ -92,17 +92,18 @@ bool ATTDevice::CheckInitStatus()
 		PRINTLN("can't assign network session key to modem: possible hardware issues?");
 		return false;
 	}
-	bool result = _modem->Start();								//start the modem up 
+	bool result = _modem->Start();  // start up the modem
 	if(result == true){
 		PRINTLN("modem initialized");
 	}
 	else{
 		PRINTLN("Parameters loaded, but modem won't start: initialization failed");
 	}
-	return result;									//we have created a connection successfully.
+	return result;
 }
 
 
+// try to send the front message (oldest) in the queue
 bool ATTDevice::trySendFront()
 {
 	if(IsQueueEmpty() == false){
@@ -113,10 +114,10 @@ bool ATTDevice::trySendFront()
 		}
 		return true;
 	}
-	return false;  // nothing left to be sent
+	return false;  // nothing left to send
 }
 
-//instructs the manager to try and send a message from it's queue (if there are any)
+// instruct the manager to try and send a message from the queue (if there are any)
 int ATTDevice::ProcessQueue()
 {
 	//PRINTLN(_modem->IsFree())
@@ -140,9 +141,10 @@ int ATTDevice::ProcessQueue()
 	return 1;  // there is still work to be done: modem is not free and still working on something
 }
 
+// add a message to the queue
 bool ATTDevice::AddToQueue(void* packet, unsigned char size, bool ack)
 {
-	//check if the packet is not too big
+	// check if the packet is not too big
 	if(size > _modem->maxPayloadForSF()){
 		PRINTLN("Data size exceeds limitations for current spreading factor.")
 		return false;
@@ -150,8 +152,8 @@ bool ATTDevice::AddToQueue(void* packet, unsigned char size, bool ack)
 	short nrRetries = 0;
 	unsigned long curTime = millis();
 	if(IsQueueEmpty() == false ||    // there could be previous payloads waiting to be sent first
-	   _modem->IsFree() == false ||  // or the modem could still be processing a packet.
-	   (_lastTimeSent != 0 && _lastTimeSent + _minTimeBetweenSend > curTime))	 // or it's not yet time to send a new packet
+	   _modem->IsFree() == false ||  // or the modem could still be processing a packet
+	   (_lastTimeSent != 0 && _lastTimeSent + _minTimeBetweenSend > curTime))  // or it's not yet time to send a new packet
 	{
 		if(IsQueueFull() == true){
 			PRINTLN("buffer is full, can't transmit packet");
@@ -163,7 +165,7 @@ bool ATTDevice::AddToQueue(void* packet, unsigned char size, bool ack)
 		}
 	}
 	else{
-		Push(packet, size, ack);  // also need to buffer it, otherwise we do a pop, which is not valid.
+		Push(packet, size, ack);
 		SendASync(packet, size, ack);
 		return true;
 	}
@@ -172,7 +174,10 @@ bool ATTDevice::AddToQueue(void* packet, unsigned char size, bool ack)
 
 void ATTDevice::SendASync(void* packet, unsigned char size, bool ack)
 {
-	float toa = _modem->calculateTimeOnAir(size);  // calculate for current settings, so BEFORE send !! -> do before checking if the previous send has failed, this way, we don't loose speed after dropping the connection (otherwise delay goes back to 130 sec, which is not required).
+	float toa = _modem->calculateTimeOnAir(size);  // calculate for current settings, so BEFORE send !!
+                                                 // -> do before checking if the previous send has failed,
+                                                 // this way, we don't lose speed after dropping the connection
+                                                 // (otherwise delay goes back to 130 sec, which is not required)
 	bool canSend = true;     // if the modem doesn't respond to the reconnect, don't try to send.
 	if(_sendFailed == true)  // restart the modem if a previous send had failed. This connects us back to the base station.
 		canSend = CheckInitStatus();
@@ -181,7 +186,7 @@ void ATTDevice::SendASync(void* packet, unsigned char size, bool ack)
 		PRINT("TOA: ") PRINTLN(toa)
 		_modem->SendAsync(packet, size, ack);
 		_lastTimeSent = millis();
-		unsigned long minTime = ceil(toa * 100);  //dynamically adjust
+		unsigned long minTime = ceil(toa * 100);  // dynamically adjust
 		if(_autoCalMinTime)
 			_minTimeBetweenSend = minTime > _minAllowedTimeBetweenSend ? minTime : _minAllowedTimeBetweenSend;
 		PRINT("min delay until next send: ") PRINT(_minTimeBetweenSend) PRINTLN(" ms")

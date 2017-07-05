@@ -5,7 +5,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -70,7 +70,7 @@ class ATT_PB {
     Adds an Integer to the payload buffer
 
     parameters:
-    - value: can be a range of -32,768 to 32,767 (2-byte) value.
+    - value: can be a range of -32,768 to 32,767 (2-byte) value
 
     returns: length of the payload or 0 when max payload size has been exceeded
     */
@@ -80,7 +80,7 @@ class ATT_PB {
     Adds a Number (Float) to the payload buffer
 
     parameters:
-    - value: can be a range between  3.4028235E+38 and -3.4028235E+38. (4 bytes) value.
+    - value: can be a range between  3.4028235E+38 and -3.4028235E+38. (4 bytes) value
 
     returns: length of the payload or 0 when max payload size has been exceeded
     */

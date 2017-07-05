@@ -5,7 +5,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,46 +38,49 @@
 #include <Stream.h>
 #include <ATT_IOT_LoRaWAN.h>
 
-/*Base class for supported data formats.
+/*
+  Base class for supported data formats.
 */
 class ContainerPacket
 {
-	public:
-		/**create the object
+  public:
+    /**
+    Create the object
 
-		parameters:
-		- device: the device that this packet will transmit data through.
-		*/
-		ContainerPacket(ATTDevice &device);
+    parameters:
+    - device: the device that this packet will transmit data through
+    */
+    ContainerPacket(ATTDevice &device);
 
-		/**get a reference to the device object.
-		*/
-		ATTDevice* GetDevice() {return _device;};
+    /**
+    Get a reference to the device object.
+    */
+    ATTDevice* GetDevice() {return _device;};
 
-	protected:
-		ATTDevice* _device;
+  protected:
+    ATTDevice* _device;
 
-		//assigns the asset/container id to the packet
-		void SetId(unsigned char id);
+    // assigns the asset/container id to the packet
+    void SetId(unsigned char id);
 
+    // resets the content of the packet back to 0 ->> all data will be removed
+    virtual void Reset() = 0;
 
-		//resets the content of the packet back to 0 ->> all data will be removed
-		virtual void Reset() = 0;
+    // get the data size of the packet
+    virtual unsigned char GetDataSize() = 0;
 
-		//get the data size of the packet
-		virtual unsigned char GetDataSize() = 0;
+    // writes the packet content to the specified byte array. This must be max 51 to 220 bytes long, depending on spreading factor.
+    // returns: the nr of bytes actually written to the array.
+    virtual unsigned char Write(unsigned char* result);
 
-		//writes the packet content to the specified byte array. This must be max 51 to 220 bytes long, depending on spreading factor.
-		//returns: the nr of bytes actually written to the array.
-		virtual unsigned char Write(unsigned char* result);
+    // returns the frame type number for this lora packet. The default value is 0x40. Inheritors that render other packet types can overwrite this
+    virtual unsigned char getFrameType();
 
-		//returns the frame type number for this lora packet. The default value is 0x40. Inheritors that render other packet types can overwrite this.
-		virtual unsigned char getFrameType();
-		//calculate the checksum of the packet and return it.
-		unsigned char calculateCheckSum(unsigned char* toSend, short len);
+    // calculate the checksum of the packet and return it
+    unsigned char calculateCheckSum(unsigned char* toSend, short len);
 
-	private:
-		unsigned char contId;
+  private:
+    unsigned char contId;
 };
 
 #endif

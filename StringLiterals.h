@@ -5,7 +5,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,7 +58,6 @@
 #define STR_UNCONFIRMED "uncnf "
 
 #define STR_CMD_SLEEP "sys sleep 259200000" // 3 days
-
 
 #endif
 
