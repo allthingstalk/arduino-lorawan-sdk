@@ -1,48 +1,82 @@
-arduinoLoRaWAN client library
-=============================
+# arduino-lorawan-sdk
 
-This is a library by AllThingsTalk that provides connectivity to the cloud through [LoRa radios](https://www.lora-alliance.org/What-Is-LoRa/Technology).  
+This is a SDK by AllThingsTalk that provides connectivity to their cloud through [LoRa radios](https://www.lora-alliance.org/What-Is-LoRa/Technology).  
 
-This library has been developed for the folowing LoRa modems: 
+## Hardware
 
+This SDK has been tested to work with the following hardware
+
+Chip
 - [Microchip](http://www.microchip.com/wwwproducts/Devices.aspx?product=RN2483)
-- others might follow
+
+Board
+- Sodaq Mbili
+- Sodaq ONE
 
 ## Installation
-  1. Download the [source code](https://github.com/allthingstalk/att-arduino-lorawan-client/archive/master.zip)
-  2. copy the content of the zip file to your arduino libraries folder (usually found at &lt;arduinosketchfolder>/libraries) or import the zip through the arduino ide.
 
-## features
-The library has the following characteristics:
- 
-### async or sync
-The Modem classes (LoRaModem and all descendents) have built in support to send data in a synchronous and asynchronous manner.  
+Download the source code and copy the content of the zip file to your arduino libraries folder (usually found at /libraries) _or_ import the .zip file directly using the Arduino IDE.
 
-- 'Send' will block untill the modem has responded that the transmission was succesfull (or not) and, if an ack was requested, untill the base station responded with the ack after succesfull transmission.
-- 'SendAsync' will only block untill the modem has responded with a(n) (un)succesfull transmission, but will not wait for the ack, even if requested. This is handled by 'CheckSendState'.
+## Examples
 
-### buffering
-Buffering of data can occur in the following situations:
+Two version of a basic example on how to get data to the AllThingsTalk Cloud are included. These examples work for both the Sodaq Mbili and Sodaq ONE. No other hardware required.
+* `counter-containers` counter using preset [container definitions](http://docs.allthingstalk.com/developers/data/default-payload-conversion/)
+* `counter-payload-builder` counter using our [custom binary payload decoding](http://docs.allthingstalk.com/developers/data/custom-payload-conversion/)
 
-- When the modem reports a transmission failure. The system can  automatically retry to send this package.  
-- if the application is sending data too fast.  LoRaWan devices can only use 1% of the radio space. Base stations can punish devices that go over this limit.  In order to prevent this, the system will calculate the minimum amount of time between 2 consecutive packages. If a message is sent too fast, it will instead be buffered and sent at the next available time-slot.  
+A third example is included to show how to print out Modem parameters
+* `instrumentation`
 
-Automatic data buffering is provided through the ATTDevice class. Whenever you use 'Send" from an instance of this class or from a [Container object](#data_formats), buffering is automatically activated.  
-Buffered data is always handled asynchronically. Send will initiate the process while 'ProcessQueue' checks the ack responses (so that it knows when the next message can be sent).    
+> When running the examples, make sure you (un)comment the correct Serial communication in the sketch
+```
+// Sodaq ONE
+#define debugSerial SerialUSB
+#define loraSerial Serial1
 
-If you do not want to use any buffering, you can always use 'Send' or 'SendAsync' directly from the modem object.   
+// Sodaq Mbili
+//#define debugSerial Serial
+//#define loraSerial Serial1
+```
 
-### data formats
-The library allows you to send data in any format that you want. All it needs is a pointer to a memory location and the length of the byte stream.  
-There are 2 pre-defined data structures included:
+## Sending data
 
-- *Containers*: this is the data format specific for [proximus](https://www.enco.io/) and used by the AllThingsTalk [RDK](http://shop.allthingstalk.com/product/lora-rapid-development-kit/) and [PDK](http://shop.allthingstalk.com/product/lorawan-track-and-trace/) products.
-- *InstrumentationPacket*: this data structure can automatically collect and transmit a number of statistics regarding the modem. 
+### Containers
 
-The predefined data structures always make use of the ATTDevice class for transmitting the data, so it is buffered and transmitted asynchronically.
+```
+Container container(Device);
 
----
+container.AddToQueue(counter, INTEGER_SENSOR);
 
-For information on installing libraries, see: http://www.arduino.cc/en/Guide/Libraries
+Device.ProcessQueue();
+```
 
-  
+### Custom binary payload
+
+Using the custom payload builder, you can send data from multiple sources in one payload. Make sure you set the correct decoding file at AllThingsTalk.
+For more information, please visit [custom-payload-conversion](http://docs.allthingstalk.com/developers/data/custom-payload-conversion/) in our documentation.
+
+```
+static uint8_t sendBuffer[51];
+ATT_PB payload(51);  // buffer is set to the same size as the sendBuffer[]
+
+payload.reset();
+payload.addInteger(counter);
+payload.copy(sendBuffer);
+
+Device.AddToQueue(&sendBuffer, payload.getSize(), false);
+Device.ProcessQueue();
+```
+
+Example decoding json
+
+> Make sure you have an `integer` asset with the correct **name** (the name you set in the decoding json) under your device in AllThingsTalk
+
+```
+{
+  "sense": [
+    {
+      "asset": "counter",
+      "value": {"byte": 0, "type": "integer"}
+    }
+  ]
+}
+```
