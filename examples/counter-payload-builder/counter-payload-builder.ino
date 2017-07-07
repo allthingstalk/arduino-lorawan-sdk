@@ -64,7 +64,7 @@ int sendState = 1;
 void sendValue(int counter)
 {
   payload.reset();
-  payload.addInteger(counter);
+  payload.addInteger(counter);  // simply repeat this line with the appropriate function to add more data to your payload, check readme for more info
   payload.copy(sendBuffer);
   Device.AddToQueue(&sendBuffer, payload.getSize(), false);  // without ACK!
   

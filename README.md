@@ -54,6 +54,26 @@ Device.ProcessQueue();
 Using the custom payload builder, you can send data from multiple sources in one payload. Make sure you set the correct decoding file at AllThingsTalk.
 For more information, please visit [custom-payload-conversion](http://docs.allthingstalk.com/developers/data/custom-payload-conversion/) in our documentation.
 
+To add more data to your payload, simply use the `addType(value)` functions
+
+* `addBoolean(uint8_t value)`
+* `addInteger(int value)`
+* `addNumber(float value)`
+* `addGPS(float latitude, float longitude, float altitude)`
+* `addAccelerometer(float x, float y, float z)`
+
+```
+payload.reset();
+payload.addInteger(counter);
+payload.addBoolean(running);
+payload.addNumber(temperature);
+payload.copy(sendBuffer);
+```
+
+When your payload is composed, copy the buffer and add it to the queue as shown below.
+
+> Make sure you set the correct decoding file at AllThingsTalk so your data is decoded correctly.
+
 ```
 static uint8_t sendBuffer[51];
 ATT_PB payload(51);  // buffer is set to the same size as the sendBuffer[]
