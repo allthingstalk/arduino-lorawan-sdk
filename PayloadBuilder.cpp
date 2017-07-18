@@ -1,59 +1,69 @@
-/*
-  Copyright 2015-2017 AllThingsTalk
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  
-  Original author: Peter Leemans
-*/
+/*    _   _ _ _____ _    _              _____     _ _     ___ ___  _  __
+ *   /_\ | | |_   _| |_ (_)_ _  __ _ __|_   _|_ _| | |__ / __|   \| |/ /
+ *  / _ \| | | | | | ' \| | ' \/ _` (_-< | |/ _` | | / / \__ \ |) | ' <
+ * /_/ \_\_|_| |_| |_||_|_|_||_\__, /__/ |_|\__,_|_|_\_\ |___/___/|_|\_\
+ *                             |___/
+ *
+ * Copyright 2017 AllThingsTalk
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include "PayloadBuilder.h"
 
 // initialize the payload buffer with the given maximum size
-ATT_PB::ATT_PB(uint8_t size) : maxsize(size)
+PayloadBuilder::PayloadBuilder(ATTDevice &device, uint8_t size) : maxsize(size)
 {
   buffer = (uint8_t*) malloc(size);
   cursor = 0;
+  _device = &device;
 }
 
-ATT_PB::~ATT_PB(void)
+PayloadBuilder::~PayloadBuilder(void)
 {
   free(buffer);
 }
 
 // reset the payload, to call before building a frame payload
-void ATT_PB::reset(void)
+void PayloadBuilder::reset(void)
 {
   cursor = 0;
 }
 
 // return the current size of the payload
-uint8_t ATT_PB::getSize(void)
+uint8_t PayloadBuilder::getSize(void)
 {
   return cursor;
 }
 
 // return the payload buffer
-uint8_t* ATT_PB::getBuffer(void)
+uint8_t* PayloadBuilder::getBuffer(void)
 {
   return buffer;
 }
 
-uint8_t ATT_PB::copy(uint8_t* dst)
+uint8_t PayloadBuilder::copy(uint8_t* dst)
 {
   memcpy(dst, buffer, cursor);
   return cursor;
 }
 
+bool PayloadBuilder::addToQueue(void* packet, unsigned char size, bool ack)
+{
+  return _device->addToQueue(packet, size, ack);  
+}
 
-uint8_t ATT_PB::addBoolean(uint8_t value)
+uint8_t PayloadBuilder::addBoolean(uint8_t value)
 {
   if ((cursor + ATTALK_BOOLEAN_SIZE) > maxsize) {
     return 0;
@@ -63,7 +73,7 @@ uint8_t ATT_PB::addBoolean(uint8_t value)
   return cursor;
 }
 
-uint8_t ATT_PB::addInteger(int value)
+uint8_t PayloadBuilder::addInteger(int value)
 {
   if ((cursor + ATTALK_INTEGER_SIZE) > maxsize) {
     return 0;
@@ -76,7 +86,7 @@ uint8_t ATT_PB::addInteger(int value)
   return cursor;
 }
 
-uint8_t ATT_PB::addNumber(float value)
+uint8_t PayloadBuilder::addNumber(float value)
 {
   if ((cursor + ATTALK_NUMBER_SIZE) > maxsize) {
     return 0;
@@ -91,7 +101,7 @@ uint8_t ATT_PB::addNumber(float value)
   return cursor;
 }
 
-uint8_t ATT_PB::addGPS(float latitude, float longitude, float altitude)
+uint8_t PayloadBuilder::addGPS(float latitude, float longitude, float altitude)
 {
   if ((cursor + ATTALK_GPS_SIZE) > maxsize) {
     return 0;
@@ -121,7 +131,7 @@ uint8_t ATT_PB::addGPS(float latitude, float longitude, float altitude)
   return cursor;
 }
 
-uint8_t ATT_PB::addAccelerometer(float x, float y, float z)
+uint8_t PayloadBuilder::addAccelerometer(float x, float y, float z)
 {
   if ((cursor + ATTALK_ACCEL_SIZE) > maxsize) {
     return 0;

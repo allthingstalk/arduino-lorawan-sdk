@@ -1,16 +1,23 @@
-/*
-  Copyright 2015-2017 AllThingsTalk
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*/
+/*    _   _ _ _____ _    _              _____     _ _     ___ ___  _  __
+ *   /_\ | | |_   _| |_ (_)_ _  __ _ __|_   _|_ _| | |__ / __|   \| |/ /
+ *  / _ \| | | | | | ' \| | ' \/ _` (_-< | |/ _` | | / / \__ \ |) | ' <
+ * /_/ \_\_|_| |_| |_||_|_|_||_\__, /__/ |_|\__,_|_|_\_\ |___/___/|_|\_\
+ *                             |___/
+ *
+ * Copyright 2017 AllThingsTalk
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include "MicrochipLoRaModem.h"
 #include "StringLiterals.h"
@@ -191,9 +198,11 @@ bool MicrochipLoRaModem::SendAsync(void* packet, unsigned char size, bool ack)
   return false;
 }
 
-// check the status of the current send operation (if there was any)
-// if there was none or the operation is done, then true is done
-// the result of the send operation is returned in the param 'sendResult'
+/**
+ * Check the status of the current send operation (if there was any)
+ * If there was none or the operation is done, then true is returned
+ * else the result of the send operation is returned in the param 'sendResult'
+ */
 bool MicrochipLoRaModem::CheckSendState(bool& sendResult)
 {
   sendResult = false;
@@ -302,7 +311,6 @@ unsigned char MicrochipLoRaModem::macTransmit(const char* type, const unsigned c
 {
   macSendCommand(type, payload, size);
 
-  // TODO lookup error
   if (!expectOK())
     return TransmissionFailure;
 
@@ -340,7 +348,7 @@ unsigned char MicrochipLoRaModem::macTransmitGetResponse()
       PRINTLN("Splittable response found");
       #endif
       onMacRX();
-      return NoError;  // TODO remove
+      return NoError;
     }
     else if (strstr(this->inputBuffer, STR_RESULT_MAC_TX_OK))
     {
@@ -402,7 +410,6 @@ uint8_t MicrochipLoRaModem::lookupMacTransmitError(const char* error)
   return NoResponse;
 }
 
-
 // waits for string, if str is found returns ok, if other string is found returns false, if timeout returns false
 bool MicrochipLoRaModem::expectString(const char* str, unsigned short timeout)
 {
@@ -424,11 +431,14 @@ bool MicrochipLoRaModem::expectString(const char* str, unsigned short timeout)
   return false;
 }
 
-// try to read a string from the input, 1 time
-// return values:
-//   -1: nothing on the buffer, try again next time
-//    0: found something that didn't match
-//    1: found something that matched
+/**
+ * Try to read a string from the input, 1 time
+ *
+ * @return
+ * -1: nothing on the buffer, try again next time
+ *  0: found something that didn't match
+ *  1: found something that matched
+ */
 char MicrochipLoRaModem::tryReadString(const char* str)
 {
   if (readLn() > 0)
@@ -439,17 +449,19 @@ char MicrochipLoRaModem::tryReadString(const char* str)
     PRINT(")");
     #endif
 
-    // TODO make more strict?
     return checkInputInstring(str);
   }
   return -1;
 }
 
-// try to read a string from the input, until it is found or until the timeout occured. This is done async
-// return values:
-//   -1: nothing on the buffer, try again next time
-//    0: found something that didn't match
-//    1: found something that matched
+/**
+ * Try to read a string from the input, until it is found or until the timeout occured. This is done async
+ *
+ * @return
+ * -1: nothing on the buffer, try again next time
+ *  0: found something that didn't match
+ *  1: found something that matched
+ */
 char expectStringAsync(const char* str, unsigned short timeout)
 {
 

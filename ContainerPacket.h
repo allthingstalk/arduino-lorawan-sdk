@@ -1,18 +1,23 @@
-/*
-  Copyright 2015-2017 AllThingsTalk
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  
-  Original author: Jan Bogaerts
-*/
+/*    _   _ _ _____ _    _              _____     _ _     ___ ___  _  __
+ *   /_\ | | |_   _| |_ (_)_ _  __ _ __|_   _|_ _| | |__ / __|   \| |/ /
+ *  / _ \| | | | | | ' \| | ' \/ _` (_-< | |/ _` | | / / \__ \ |) | ' <
+ * /_/ \_\_|_| |_| |_||_|_|_||_\__, /__/ |_|\__,_|_|_\_\ |___/___/|_|\_\
+ *                             |___/
+ *
+ * Copyright 2017 AllThingsTalk
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef ContainerPacket_h
 #define ContainerPacket_h
@@ -45,33 +50,32 @@ class ContainerPacket
 {
   public:
     /**
-    Create the object
-
-    parameters:
-    - device: the device that this packet will transmit data through
-    */
+     * Create the object
+     *
+     * @param device the device that this packet will transmit data through
+     */
     ContainerPacket(ATTDevice &device);
 
     /**
-    Get a reference to the device object.
-    */
-    ATTDevice* GetDevice() {return _device;};
+     * Get a reference to the device object
+     */
+    ATTDevice* getDevice() {return _device;};
 
   protected:
     ATTDevice* _device;
 
     // assigns the asset/container id to the packet
-    void SetId(unsigned char id);
+    void setId(unsigned char id);
 
     // resets the content of the packet back to 0 ->> all data will be removed
-    virtual void Reset() = 0;
+    virtual void reset() = 0;
 
     // get the data size of the packet
-    virtual unsigned char GetDataSize() = 0;
+    virtual unsigned char getDataSize() = 0;
 
     // writes the packet content to the specified byte array. This must be max 51 to 220 bytes long, depending on spreading factor.
     // returns: the nr of bytes actually written to the array.
-    virtual unsigned char Write(unsigned char* result);
+    virtual unsigned char write(unsigned char* result);
 
     // returns the frame type number for this lora packet. The default value is 0x40. Inheritors that render other packet types can overwrite this
     virtual unsigned char getFrameType();
