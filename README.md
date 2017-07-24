@@ -41,6 +41,8 @@ A third example is included to show how to print out Modem parameters
 
 ### Containers
 
+To use the container format, simply define a `Container` object at the start of your sketch.
+
 ```
 Container container(Device);
 ```
@@ -54,6 +56,12 @@ device.processQueue();
 Using the custom payload builder, you can send data from multiple sources in one payload. Make sure you set the correct decoding file at AllThingsTalk.
 For more information, please visit [custom-payload-conversion](http://docs.allthingstalk.com/developers/data/custom-payload-conversion/) in our documentation.
 
+To use the custom payload format, simply define a `PayloadBuilder` object at the start of your sketch.
+
+```
+PayloadBuilder payload(device);
+```
+
 To add more data to your payload, simply use the `addType(value)` functions
 
 * `addBoolean(uint8_t value)`
@@ -62,27 +70,16 @@ To add more data to your payload, simply use the `addType(value)` functions
 * `addGPS(float latitude, float longitude, float altitude)`
 * `addAccelerometer(float x, float y, float z)`
 
-```
-payload.reset();
-payload.addInteger(counter);
-payload.addBoolean(running);
-payload.addNumber(temperature);
-payload.copy(sendBuffer);
-```
+> Reset the payload before building a new one!
 
-When your payload is composed, copy the buffer and add it to the queue as shown below.
-
-> Make sure you set the correct decoding file at AllThingsTalk so your data is decoded correctly.
-
-```
-PayloadBuilder payload(device);
-```
 ```
 payload.reset();
 payload.addInteger(counter);
 payload.addToQueue(false);
 device.processQueue();
 ```
+
+> Set the correct decoding file at AllThingsTalk so your data is decoded correctly.
 
 Example decoding json
 

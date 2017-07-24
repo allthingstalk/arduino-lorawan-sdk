@@ -37,7 +37,7 @@
 MicrochipLoRaModem modem(&loraSerial, &debugSerial);
 ATTDevice device(&modem, &debugSerial);
 
-PayloadBuilder payload(device, 51);
+PayloadBuilder payload(device);
 
 void setup() 
 {

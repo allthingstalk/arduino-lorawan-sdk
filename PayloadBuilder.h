@@ -40,6 +40,7 @@ class PayloadBuilder {
   public:
   
     // Initialize the payload buffer with the given maximum size
+    PayloadBuilder(ATTDevice &device);
     PayloadBuilder(ATTDevice &device, uint8_t size);
     ~PayloadBuilder();
 

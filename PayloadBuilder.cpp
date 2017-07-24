@@ -20,11 +20,19 @@
  */
 
 #include "PayloadBuilder.h"
+#include "LoRaModem.h"
 
 // initialize the payload buffer with the given maximum size
 PayloadBuilder::PayloadBuilder(ATTDevice &device, uint8_t size) : maxsize(size)
 {
   buffer = (uint8_t*) malloc(size);
+  cursor = 0;
+  _device = &device;
+}
+
+PayloadBuilder::PayloadBuilder(ATTDevice &device) : maxsize(SMALLEST_PAYLOAD_SIZE)
+{
+  buffer = (uint8_t*) malloc(SMALLEST_PAYLOAD_SIZE);
   cursor = 0;
   _device = &device;
 }
