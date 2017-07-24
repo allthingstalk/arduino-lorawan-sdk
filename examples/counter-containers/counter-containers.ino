@@ -46,13 +46,14 @@ void setup()
   loraSerial.begin(modem.getDefaultBaudRate());  // init the baud rate of the serial connection so that it's ok for the modem
   while((!debugSerial) && (millis()) < 30000){}
   
-  while(!Device.initABP(DEV_ADDR, APPSKEY, NWKSKEY));
+  while(!device.initABP(DEV_ADDR, APPSKEY, NWKSKEY));
   debugSerial.println("Ready to send data");
 }
 
 void sendValue(int counter)
 {
-  container.addToQueue(counter, INTEGER_SENSOR);
+  container.addToQueue((short) counter, INTEGER_SENSOR, false);
+  
   device.processQueue();
 }
 

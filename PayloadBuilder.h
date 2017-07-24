@@ -54,6 +54,11 @@ class PayloadBuilder {
     bool addToQueue(void* packet, unsigned char size, bool ack);
 
     /**
+     * Copy and add the payload to the queue
+     */
+    bool addToQueue(bool ack);
+    
+    /**
      * Return the current size of the payload
      */
     uint8_t getSize(void);
@@ -125,6 +130,7 @@ class PayloadBuilder {
     uint8_t *buffer;
     uint8_t maxsize;
     uint8_t cursor;
+    uint8_t sendBuffer[51];
 };
 
 #endif

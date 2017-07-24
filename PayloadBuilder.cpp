@@ -63,6 +63,12 @@ bool PayloadBuilder::addToQueue(void* packet, unsigned char size, bool ack)
   return _device->addToQueue(packet, size, ack);  
 }
 
+bool PayloadBuilder::addToQueue(bool ack)
+{
+  memcpy(sendBuffer, buffer, cursor);
+  return _device->addToQueue(&sendBuffer, cursor, ack);  
+}
+
 uint8_t PayloadBuilder::addBoolean(uint8_t value)
 {
   if ((cursor + ATTALK_BOOLEAN_SIZE) > maxsize) {

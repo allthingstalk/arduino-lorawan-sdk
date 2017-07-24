@@ -43,10 +43,10 @@ A third example is included to show how to print out Modem parameters
 
 ```
 Container container(Device);
-
-container.AddToQueue(counter, INTEGER_SENSOR);
-
-Device.ProcessQueue();
+```
+```
+container.addToQueue(counter, INTEGER_SENSOR, false);
+device.processQueue();
 ```
 
 ### Custom binary payload
@@ -75,15 +75,13 @@ When your payload is composed, copy the buffer and add it to the queue as shown 
 > Make sure you set the correct decoding file at AllThingsTalk so your data is decoded correctly.
 
 ```
-static uint8_t sendBuffer[51];
-ATT_PB payload(51);  // buffer is set to the same size as the sendBuffer[]
-
+PayloadBuilder payload(device);
+```
+```
 payload.reset();
 payload.addInteger(counter);
-payload.copy(sendBuffer);
-
-Device.AddToQueue(&sendBuffer, payload.getSize(), false);
-Device.ProcessQueue();
+payload.addToQueue(false);
+device.processQueue();
 ```
 
 Example decoding json
@@ -99,4 +97,20 @@ Example decoding json
     }
   ]
 }
+```
+
+### Handling the queue
+
+`processQueue()` will return a number based on the success of sending the message.
+In case of a failure (`-1`), you can remove the message from the queue if wanted using `pop()`.
+
+```
+sendState = device.processQueue();
+
+if(sendState == -1)
+{
+  debugSerial.println("Failed to send data; removing from queue");
+  device.pop();
+}
+
 ```

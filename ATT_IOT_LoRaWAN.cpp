@@ -23,11 +23,11 @@
 #include "Utils.h"
 //#include <arduino.h>  // still required for the 'delay' function
 
-
 // create the object
-ATTDevice::ATTDevice(LoRaModem* modem, Stream* monitor, bool autoCalMinTime, unsigned int minTime):  _minTimeBetweenSend(minTime), 
-                                                   _autoCalMinTime(autoCalMinTime), 
-                                                   _minAllowedTimeBetweenSend(minTime)
+ATTDevice::ATTDevice(LoRaModem* modem, Stream* monitor, bool autoCalMinTime, unsigned int minTime):
+  _minTimeBetweenSend(minTime), 
+  _autoCalMinTime(autoCalMinTime), 
+  _minAllowedTimeBetweenSend(minTime)
 {
   _modem = modem;
   _monitor = monitor;

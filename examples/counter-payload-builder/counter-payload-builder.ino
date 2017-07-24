@@ -37,8 +37,7 @@
 MicrochipLoRaModem modem(&loraSerial, &debugSerial);
 ATTDevice device(&modem, &debugSerial);
 
-static uint8_t sendBuffer[51];
-PayloadBuilder payload(51, device);  // buffer is set to the same size as the sendBuffer[]
+PayloadBuilder payload(device, 51);
 
 void setup() 
 {
@@ -56,8 +55,7 @@ void sendValue(int counter)
 {
   payload.reset();
   payload.addInteger(counter);
-  payload.copy(sendBuffer);
-  payload.addToQueue(&sendBuffer, payload.getSize(), false);  // without ACK!
+  payload.addToQueue(false);
   
   device.processQueue();
 }
