@@ -93,7 +93,7 @@ bool Container::add(bool value)
   return true;
 }
 
-bool Container::addToQueue(short value, short id, bool ack)
+bool Container::addToQueue(int16_t value, short id, bool ack)
 {
   unsigned char buffer[220];
   reset();
@@ -105,7 +105,7 @@ bool Container::addToQueue(short value, short id, bool ack)
   return _device->addToQueue(buffer, length, ack);
 }
 
-bool Container::add(short value)
+bool Container::add(int16_t value)
 {
   if(nrInts >= 16)
     return false;

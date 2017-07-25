@@ -68,7 +68,7 @@ class Container: public ContainerPacket
      *
      * @return true upon success
      */
-    bool addToQueue(short value, short id, bool ack = true);
+    bool addToQueue(int16_t value, short id, bool ack = true);
 
     /**
      * Send a string data value to the cloud server for the sensor with the specified id.
@@ -169,7 +169,7 @@ class Container: public ContainerPacket
      * Send an integer value to the cloud server for the sensor with the specified id
      * If ack = true -> request acknowledge, otherwise no acknowledge is waited for
      */
-    bool add(short value);
+    bool add(int16_t value);
 
     /**
      * Send a string data value to the cloud server for the sensor with the specified id

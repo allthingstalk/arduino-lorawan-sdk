@@ -50,14 +50,14 @@ void setup()
   debugSerial.println("Ready to send data");
 }
 
-void sendValue(int counter)
+void sendValue(int16_t counter)
 {
-  container.addToQueue((short) counter, INTEGER_SENSOR, false);
+  container.addToQueue(counter, INTEGER_SENSOR, false);
   
   device.processQueue();
 }
 
-short counter = 0;
+int16_t counter = 0;
 unsigned long sendNextAt = 0;
 void loop() 
 {
