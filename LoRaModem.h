@@ -71,7 +71,7 @@ class LoRaModem
     
     returns: true upon success
     */
-    virtual bool Stop() = 0;
+    virtual bool stop() = 0;
     
     /** 
     Set the modem in LoRaWan mode (versus private networks).
@@ -81,7 +81,7 @@ class LoRaModem
     
     returns: true upon success
     */
-    virtual bool SetLoRaWan(bool adr = true) = 0;
+    virtual bool setLoRaWan(bool adr = true) = 0;
     
     /**
     Assign a device address to the modem.
@@ -91,7 +91,7 @@ class LoRaModem
     
     returns: true upon success
     */
-    virtual bool SetDevAddress(const unsigned char* devAddress) = 0;
+    virtual bool setDevAddress(const unsigned char* devAddress) = 0;
     
     
     /**
@@ -102,7 +102,7 @@ class LoRaModem
     
     returns: true upon success
     */
-    virtual bool SetAppsKey(const unsigned char* appsKey) = 0;
+    virtual bool setAppsKey(const unsigned char* appsKey) = 0;
     
     /** set the network session key
     
@@ -111,14 +111,14 @@ class LoRaModem
     
     returns: true upon success
     */
-    virtual bool SetNWKSKey(const unsigned char*  nwksKey) = 0;
+    virtual bool setNWKSKey(const unsigned char*  nwksKey) = 0;
     
     /**
     Start the modem.
     
     returns: true upon success.
     */
-    virtual bool Start() = 0;
+    virtual bool start() = 0;
     
     /**
     Send a data packet to the NSP.
@@ -132,7 +132,7 @@ class LoRaModem
     
     returns: true upon success
     */
-    virtual bool Send(void* packet, unsigned char size, bool ack = true);
+    virtual bool send(void* packet, unsigned char size, bool ack = true);
     
     /**
     Start the send process, but return before everything is done.
@@ -141,7 +141,7 @@ class LoRaModem
     
     returns: true if the packet was succesfully send, and the process of waiting for a resonse can begin. Otherwise, it returns false
     */
-    virtual bool SendAsync(void* packet, unsigned char size, bool ack = true) = 0;
+    virtual bool sendAsync(void* packet, unsigned char size, bool ack = true) = 0;
     
     /**
     Checks the status of the current send operation (if there was any).
@@ -151,17 +151,17 @@ class LoRaModem
      
     returns: if there was none or the operation is done
     */
-    virtual bool CheckSendState(bool& sendResult) = 0;
+    virtual bool checkSendState(bool& sendResult) = 0;
     
     /**
     returns: true if the modem can send a payload. If it can't at the moment (still processing another packet), then false is returned
     */
-    inline bool IsFree(){ return sendState == SENDSTATE_DONE; };
+    inline bool isFree(){ return sendState == SENDSTATE_DONE; };
     
     /**
     Process any incoming packets from the modem.
     */
-    virtual void ProcessIncoming() = 0;
+    virtual void processIncoming() = 0;
     
     /**
     Extract the specified instrumentation parameter from the modem and return the value.
@@ -173,12 +173,12 @@ class LoRaModem
     
     returns: the value of the specified parameter
     */
-    virtual int GetParam(instrumentationParam param) = 0;
+    virtual int getParam(instrumentationParam param) = 0;
     
     /**
     returns: the id number of the modem type. See the container definition for the instrumentation container to see more details
     */
-    virtual int GetModemId() = 0;
+    virtual int getModemId() = 0;
     
     /**calcualte the max payload size, based on the current spreading factor of the modem. Used to check if the packet can be sent.
     
@@ -203,7 +203,7 @@ class LoRaModem
     /**
     Get the current state of the (async) send operation.
     */
-    char GetSendState() {return sendState;};
+    char getSendState() {return sendState;};
     
   protected:
     Stream *_monitor;

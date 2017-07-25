@@ -42,7 +42,7 @@ MicrochipLoRaModem::MicrochipLoRaModem(SerialType* stream, Stream *monitor, ATT_
   _monitor = monitor;
 }
 
-bool MicrochipLoRaModem::Stop()
+bool MicrochipLoRaModem::stop()
 {
 #ifdef FULLDEBUG
   PRINTLN("[resetDevice]");
@@ -55,7 +55,7 @@ bool MicrochipLoRaModem::Stop()
     #ifdef FULLDEBUG
       PRINTLN("initial reset failed, starting wakeup sequence");
     #endif
-    WakeUp();  // try to wakeup the modem and send the messages again. sometimes the modem is just not correctly woken up after a new sketch was loaded
+    wakeUp();  // try to wakeup the modem and send the messages again. sometimes the modem is just not correctly woken up after a new sketch was loaded
     #ifdef FULLDEBUG
       PRINTLN("retrying reset");
     #endif
@@ -87,7 +87,7 @@ char MicrochipLoRaModem::checkInputInstring(const char* str)
   return 0;
 }
 
-bool MicrochipLoRaModem::SetLoRaWan(bool adr)
+bool MicrochipLoRaModem::setLoRaWan(bool adr)
 {
   // lorawan should be on by default (no private supported)
   return setMacParam(STR_ADR, BOOL_TO_ONOFF(adr));  // set to adaptive variable rate transmission
@@ -98,7 +98,7 @@ unsigned int MicrochipLoRaModem::getDefaultBaudRate()
   return 57600; 
 };
 
-bool MicrochipLoRaModem::SetDevAddress(const unsigned char* devAddress)
+bool MicrochipLoRaModem::setDevAddress(const unsigned char* devAddress)
 {
 #ifdef FULLDEBUG
   PRINTLN("Setting the DevAddr");
@@ -106,7 +106,7 @@ bool MicrochipLoRaModem::SetDevAddress(const unsigned char* devAddress)
   return setMacParam(STR_DEV_ADDR, devAddress, 4); 
 }
 
-bool MicrochipLoRaModem::SetAppsKey(const unsigned char* appsKey)
+bool MicrochipLoRaModem::setAppsKey(const unsigned char* appsKey)
 {
   #ifdef FULLDEBUG
   PRINTLN("Setting the AppSKey"); 
@@ -114,7 +114,7 @@ bool MicrochipLoRaModem::SetAppsKey(const unsigned char* appsKey)
   return setMacParam(STR_APP_SESSION_KEY, appsKey, 16);
 }
 
-bool MicrochipLoRaModem::SetNWKSKey(const unsigned char*  nwksKey)
+bool MicrochipLoRaModem::setNWKSKey(const unsigned char*  nwksKey)
 {
   #ifdef FULLDEBUG
   PRINTLN("Setting the NwkSKey"); 
@@ -122,7 +122,7 @@ bool MicrochipLoRaModem::SetNWKSKey(const unsigned char*  nwksKey)
   return setMacParam(STR_NETWORK_SESSION_KEY, nwksKey, 16);
 }
 
-bool MicrochipLoRaModem::Start()
+bool MicrochipLoRaModem::start()
 {
   #ifdef FULLDEBUG
   PRINTLN("Sending the network start commands");
@@ -148,7 +148,7 @@ bool MicrochipLoRaModem::Start()
 }
 
 #ifdef ENABLE_SLEEP
-void MicrochipLoRaModem::Sleep()
+void MicrochipLoRaModem::sleep()
 {
   #ifdef FULLDEBUG
   PRINTLN("putting the modem into sleep mode");
@@ -163,7 +163,7 @@ void MicrochipLoRaModem::Sleep()
 }
 
 
-void MicrochipLoRaModem::WakeUp()
+void MicrochipLoRaModem::wakeUp()
 {
   // "emulate" break condition
   _stream->flush();
@@ -181,9 +181,9 @@ void MicrochipLoRaModem::WakeUp()
 #endif
 
 // send a data packet to the server
-bool MicrochipLoRaModem::SendAsync(void* packet, unsigned char size, bool ack)
+bool MicrochipLoRaModem::sendAsync(void* packet, unsigned char size, bool ack)
 {
-  if(LoRaModem::Send(packet, size, ack)){  // check size, copy to buffer, show hex on debug serial. If this is not ok, don't try to send.
+  if(LoRaModem::send(packet, size, ack)){  // check size, copy to buffer, show hex on debug serial. If this is not ok, don't try to send.
     sendState = SENDSTATE_TRANSMITCOMMAND;
     if(ack == true)
       macSendCommand(STR_CONFIRMED, (unsigned char*)packet, size);
@@ -203,7 +203,7 @@ bool MicrochipLoRaModem::SendAsync(void* packet, unsigned char size, bool ack)
  * If there was none or the operation is done, then true is returned
  * else the result of the send operation is returned in the param 'sendResult'
  */
-bool MicrochipLoRaModem::CheckSendState(bool& sendResult)
+bool MicrochipLoRaModem::checkSendState(bool& sendResult)
 {
   sendResult = false;
   unsigned long curTime = millis();
@@ -586,13 +586,11 @@ bool MicrochipLoRaModem::setMacParam(const char* paramName, const char* paramVal
   return expectOK();
 }
 
-
 // process any incoming packets from the modem
- void MicrochipLoRaModem::ProcessIncoming()
- {
+void MicrochipLoRaModem::processIncoming()
+{
   readLn();
- }
-
+}
 
 unsigned char MicrochipLoRaModem::onMacRX()
 {
@@ -624,7 +622,7 @@ unsigned char MicrochipLoRaModem::onMacRX()
 }
 
 // extract the specified instrumentation parameter from the modem and return the value
-int MicrochipLoRaModem::GetParam(instrumentationParam param)
+int MicrochipLoRaModem::getParam(instrumentationParam param)
 {
   switch(param){
     case MODEM: return 0;
@@ -765,7 +763,7 @@ int MicrochipLoRaModem::sfToIndex(char* value)
 }
 
 // returns the id number of the modem type. See the container definition for the instrumentation container to see more details
-int MicrochipLoRaModem::GetModemId()
+int MicrochipLoRaModem::getModemId()
 {
   return 3;
 }

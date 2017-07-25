@@ -50,7 +50,8 @@ bool ATTDevice::initABP(const uint8_t* devAddress, const uint8_t* appsKey, const
   
   _adr = adr;
   PRINT("ATT lib version: "); PRINTLN(VERSION);
-  if(!_modem->Stop()){  // stop any previously running modems
+  if(!_modem->stop())  // stop any previously running modems
+  {
     PRINTLN("can't communicate with modem: possible hardware issues");
     return false;
   }
@@ -83,23 +84,23 @@ bool ATTDevice::hasKeys()
 
 bool ATTDevice::checkInitStatus()
 {
-  if (!_modem->SetLoRaWan(_adr)){  // switch to LoRaWAN mode instead of peer to peer        
+  if (!_modem->setLoRaWan(_adr)){  // switch to LoRaWAN mode instead of peer to peer        
     PRINTLN("can't set adr: possible hardware issues?");
     return false;
   }
-  if(!_modem->SetDevAddress(_devAddress)){
+  if(!_modem->setDevAddress(_devAddress)){
     PRINTLN("can't assign device address to modem: possible hardware issues?");
     return false;
   }
-  if(!_modem->SetAppsKey(_appsKey)){
+  if(!_modem->setAppsKey(_appsKey)){
     PRINTLN("can't assign app session key to modem: possible hardware issues?");
     return false;
   }
-  if(!_modem->SetNWKSKey(_nwksKey)){
+  if(!_modem->setNWKSKey(_nwksKey)){
     PRINTLN("can't assign network session key to modem: possible hardware issues?");
     return false;
   }
-  bool result = _modem->Start();  // start up the modem
+  bool result = _modem->start();  // start up the modem
   if(result == true){
     PRINTLN("modem initialized");
   }
@@ -127,11 +128,11 @@ bool ATTDevice::trySendFront()
 // instruct the manager to try and send a message from the queue (if there are any)
 int ATTDevice::processQueue()
 {
-  //PRINTLN(_modem->IsFree())
+  //PRINTLN(_modem->isFree())
   bool sendResult = false;
-  if(_modem->IsFree() == true)
+  if(_modem->isFree() == true)
     return (int)trySendFront();
-  else if(_modem->CheckSendState(sendResult) == true){
+  else if(_modem->checkSendState(sendResult) == true){
     if(sendResult == true){  // modem succesfully sent a packet, so remove from queue
       PRINTLN("modem reported successfull send")
       _sendFailed = false;
@@ -140,7 +141,7 @@ int ATTDevice::processQueue()
     }
     else{
       PRINTLN("modem reported failed send")
-      _modem->Stop();
+      _modem->stop();
       _sendFailed = true;
       return -1;
     }
@@ -159,7 +160,7 @@ bool ATTDevice::addToQueue(void* packet, unsigned char size, bool ack)
   short nrRetries = 0;
   unsigned long curTime = millis();
   if(isQueueEmpty() == false ||    // there could be previous payloads waiting to be sent first
-     _modem->IsFree() == false ||  // or the modem could still be processing a packet
+     _modem->isFree() == false ||  // or the modem could still be processing a packet
      (_lastTimeSent != 0 && _lastTimeSent + _minTimeBetweenSend > curTime))  // or it's not yet time to send a new packet
   {
     if(isQueueFull() == true){
@@ -188,7 +189,7 @@ void ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
 
   if(canSend){
     PRINT("TOA: ") PRINTLN(toa)
-    _modem->SendAsync(packet, size, ack);
+    _modem->sendAsync(packet, size, ack);
     _lastTimeSent = millis();
     unsigned long minTime = ceil(toa * 100);  // dynamically adjust
     if(_autoCalMinTime)

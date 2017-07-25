@@ -37,7 +37,7 @@ int LoRaModem::maxPayloadForSF(short spreading_factor)
 {	
 	if (spreading_factor < 0){
 		if(sendState == SENDSTATE_DONE)
-			spreading_factor = GetParam(SP_FACTOR) + 6;
+			spreading_factor = getParam(SP_FACTOR) + 6;
 		else
 			return _prevPayloadForSF;
 	}
@@ -53,9 +53,9 @@ int LoRaModem::maxPayloadForSF(short spreading_factor)
 float LoRaModem::calculateSymbolTime(short spreading_factor, short bandwidth) 
 {
 	if (spreading_factor < 0)
-		spreading_factor = GetParam(SP_FACTOR) + 6;
+		spreading_factor = getParam(SP_FACTOR) + 6;
 	if (bandwidth < 0)
-		bandwidth = (pow(2, GetParam(BANDWIDTH)) - 1) * 125;
+		bandwidth = (pow(2, getParam(BANDWIDTH)) - 1) * 125;
 	return (pow(2, (float) spreading_factor)) / ((float) bandwidth * 1000.0) * 1000.0;
 }
 
@@ -69,9 +69,9 @@ float LoRaModem::calculateTimeOnAir(unsigned char appPayloadSize, short spreadin
 int LoRaModem::calculateSymbolsInPayload(unsigned char appPayloadSize, short spreading_factor) 
 {
 	if (spreading_factor < 0)
-		spreading_factor = GetParam(SP_FACTOR) + 6;
-	int bandwidth = (pow(2, GetParam(BANDWIDTH)) - 1) * 125;
-	int coding_rate = GetParam(CODING_RATE) + 5;
+		spreading_factor = getParam(SP_FACTOR) + 6;
+	int bandwidth = (pow(2, getParam(BANDWIDTH)) - 1) * 125;
+	int coding_rate = getParam(CODING_RATE) + 5;
 	int low_dr_corr = ((spreading_factor == 11 || spreading_factor == 12) && bandwidth == 125) ? 2 : 0;
 	float temp = (((float )(8 * (appPayloadSize + LORA_HEADER_SIZE))
 									- (4 * spreading_factor) + 28 + 16
@@ -81,7 +81,7 @@ int LoRaModem::calculateSymbolsInPayload(unsigned char appPayloadSize, short spr
 
 }
 
-bool LoRaModem::Send(void* packet, unsigned char size, bool ack)
+bool LoRaModem::send(void* packet, unsigned char size, bool ack)
 {
 	if(sendState != SENDSTATE_DONE){
 		PRINTLN("A previous async send operation is still. Please wait untill done");

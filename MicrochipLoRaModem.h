@@ -82,7 +82,7 @@ class MicrochipLoRaModem: public LoRaModem
      *
      * @return true upon success
      */
-    bool Stop();
+    bool stop();
     
     /**
      * Set the modem in LoRaWan mode (vs private networks)
@@ -91,7 +91,7 @@ class MicrochipLoRaModem: public LoRaModem
      *
      * @return true upon success
      */
-    bool SetLoRaWan(bool adr = true);
+    bool setLoRaWan(bool adr = true);
     
     /**
      * Assign a device address to the modem
@@ -100,7 +100,7 @@ class MicrochipLoRaModem: public LoRaModem
      *
      * @return true upon success
      */
-    bool SetDevAddress(const unsigned char* devAddress);
+    bool setDevAddress(const unsigned char* devAddress);
     
     /**
      * Set the app session key for the modem communication
@@ -109,7 +109,7 @@ class MicrochipLoRaModem: public LoRaModem
      *
      * @return true upon success
      */
-    bool SetAppsKey(const unsigned char* appsKey);
+    bool setAppsKey(const unsigned char* appsKey);
     
     /**
      * Set the network session key
@@ -118,14 +118,14 @@ class MicrochipLoRaModem: public LoRaModem
      *
      * @return true upon success
      */
-    bool SetNWKSKey(const unsigned char*  nwksKey);
+    bool setNWKSKey(const unsigned char*  nwksKey);
     
     /**
      * Start the modem
      *
      * @return true upon success
      */
-    bool Start();
+    bool start();
     
     /**
      * Start the send process, but return before everything is done.
@@ -136,7 +136,7 @@ class MicrochipLoRaModem: public LoRaModem
      *
      * @return true if the packet was succesfully send, and the process of waiting for a resonse can begin. Otherwise return false
      */
-    bool SendAsync(void* packet, unsigned char size, bool ack = true);
+    bool sendAsync(void* packet, unsigned char size, bool ack = true);
     
     /**
      * Check the status of the current send operation (if there was any)
@@ -145,12 +145,12 @@ class MicrochipLoRaModem: public LoRaModem
      *
      * @return true if there was no pending send operation or the operation is done
      */
-    bool CheckSendState(bool& sendResult);
+    bool checkSendState(bool& sendResult);
     
     /**
      * Process any incoming packets from the modem
      */
-    void ProcessIncoming();
+    void processIncoming();
     
     /**
      * Extract the specified instrumentation parameter from the modem and return the value
@@ -159,24 +159,24 @@ class MicrochipLoRaModem: public LoRaModem
      *
      * @return the value of the specified parameter
      */
-    int GetParam(instrumentationParam param);
+    int getParam(instrumentationParam param);
         
     /**
      * Returns the id number of the modem type.
      * See the container definition for the instrumentation container to see more details.
      */
-    int GetModemId();
+    int getModemId();
     
     #ifdef ENABLE_SLEEP
     /**
      * Put the modem in sleep mode for 3 days (use WakeUp if you want to send something earlier)
      */
-    void Sleep();
+    void sleep();
     
     /**
      * Wake up the device after it has been put the sleep
      */
-    void WakeUp();
+    void wakeUp();
     
     /**
      * Retrieve the specified parameter from the MicrochipLoRaModem
