@@ -106,12 +106,12 @@ bool MicrochipLoRaModem::SetDevAddress(const unsigned char* devAddress)
   return setMacParam(STR_DEV_ADDR, devAddress, 4); 
 }
 
-bool MicrochipLoRaModem::SetAppKey(const unsigned char* appKey)
+bool MicrochipLoRaModem::SetAppsKey(const unsigned char* appsKey)
 {
   #ifdef FULLDEBUG
   PRINTLN("Setting the AppSKey"); 
   #endif  
-  return setMacParam(STR_APP_SESSION_KEY, appKey, 16);
+  return setMacParam(STR_APP_SESSION_KEY, appsKey, 16);
 }
 
 bool MicrochipLoRaModem::SetNWKSKey(const unsigned char*  nwksKey)

@@ -92,7 +92,7 @@ class ATTDevice
      *
      * > Even if this function returns true, this does not yet mean you are already in contact with a base station. It only means that the modem was succesfully configured with the provided parameters and an abp request has been made. The library will however automatically try to reconnect using abp mode when there was a problem with the connection.
      */
-    bool initABP(const uint8_t* devAddress, const uint8_t* appKey, const uint8_t*  nwksKey, bool adr = true);
+    bool initABP(const uint8_t* devAddress, const uint8_t* appsKey, const uint8_t*  nwksKey, bool adr = true);
 
     /**
      * Send the specified payload to the NSP
@@ -153,7 +153,7 @@ class ATTDevice
     bool _autoCalMinTime;
     
     const uint8_t* _devAddress;
-    const uint8_t* _appKey;
+    const uint8_t* _appsKey;
     const uint8_t* _nwksKey;
     bool _adr;
     

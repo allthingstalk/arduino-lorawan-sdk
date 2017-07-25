@@ -98,11 +98,11 @@ class LoRaModem
     Set the app session key for the modem communication.
     
     parameters:
-    - appkey: the app session key, must be 16 bytes long
+    - appskey: the app session key, must be 16 bytes long
     
     returns: true upon success
     */
-    virtual bool SetAppKey(const unsigned char* appKey) = 0;
+    virtual bool SetAppsKey(const unsigned char* appsKey) = 0;
     
     /** set the network session key
     

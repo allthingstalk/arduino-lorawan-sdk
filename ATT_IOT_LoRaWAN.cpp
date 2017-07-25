@@ -36,10 +36,10 @@ ATTDevice::ATTDevice(LoRaModem* modem, Stream* monitor, bool autoCalMinTime, uns
 }
 
 // connect with the to the lora gateway
-bool ATTDevice::initABP(const uint8_t* devAddress, const uint8_t* appKey, const uint8_t* nwksKey, bool adr)
+bool ATTDevice::initABP(const uint8_t* devAddress, const uint8_t* appsKey, const uint8_t* nwksKey, bool adr)
 {
   _devAddress = devAddress;
-  _appKey = appKey;
+  _appsKey = appsKey;
   _nwksKey = nwksKey;
   
   if(!hasKeys())
@@ -65,9 +65,9 @@ bool ATTDevice::hasKeys()
   {
     sum[0] += _devAddress[i];
   }
-  for(int i=0; i<sizeof(_appKey); i++)
+  for(int i=0; i<sizeof(_appsKey); i++)
   {
-    sum[1] += _appKey[i];
+    sum[1] += _appsKey[i];
   }
   for(int i=0; i<sizeof(_nwksKey); i++)
   {
@@ -91,7 +91,7 @@ bool ATTDevice::checkInitStatus()
     PRINTLN("can't assign device address to modem: possible hardware issues?");
     return false;
   }
-  if(!_modem->SetAppKey(_appKey)){
+  if(!_modem->SetAppsKey(_appsKey)){
     PRINTLN("can't assign app session key to modem: possible hardware issues?");
     return false;
   }

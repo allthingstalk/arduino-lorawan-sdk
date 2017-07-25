@@ -44,7 +44,7 @@ A third example is included to show how to print out Modem parameters
 To use the container format, simply define a `Container` object at the start of your sketch.
 
 ```
-Container container(Device);
+Container container(device);
 ```
 ```
 container.addToQueue(counter, INTEGER_SENSOR, false);
