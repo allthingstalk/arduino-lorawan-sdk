@@ -39,43 +39,43 @@ class PayloadBuilder {
   
   public:
   
-    // Initialize the payload buffer with the given maximum size
+    // Constructors
     PayloadBuilder(ATTDevice &device);
     PayloadBuilder(ATTDevice &device, uint8_t size);
     ~PayloadBuilder();
 
     /**
-     * Reset the payload, to call before building a frame payload
+     * Reset the payload, to call before building a frame payload.
      */
     void reset(void);
     
     /**
-     * Add the payload to the queue
+     * Add the payload to the queue.
      */
     bool addToQueue(void* packet, unsigned char size, bool ack);
 
     /**
-     * Copy and add the payload to the queue
+     * Copy and add the payload to the queue.
      */
     bool addToQueue(bool ack);
     
     /**
-     * Return the current size of the payload
+     * Return the current size of the payload.
      */
     uint8_t getSize(void);
 
     /**
-     * Return the payload buffer
+     * Return the payload buffer.
      */
     uint8_t* getBuffer(void);
 
     /**
-     * Copy the payload buffer
+     * Copy the payload buffer.
      */
     uint8_t copy(uint8_t* buffer);
 
     /**
-     * Add a Boolean to the payload buffer
+     * Add a Boolean to the payload buffer.
      *
      * @param value can be 0 or 1, represents the boolean
      *
@@ -84,7 +84,7 @@ class PayloadBuilder {
     uint8_t addBoolean(uint8_t value);
 
     /**
-     * Adds an Integer to the payload buffer
+     * Add an Integer to the payload buffer.
      *
      * @param value can be a range of -32,768 to 32,767 (2 bytes) value
      *
@@ -93,7 +93,7 @@ class PayloadBuilder {
     uint8_t addInteger(int value);
 
     /**
-     * Adds a Number (Float) to the payload buffer
+     * Add a Number (Float) to the payload buffer.
      *
      * @param value can be a range between  3.4028235E+38 and -3.4028235E+38 (4 bytes) value
      *
@@ -102,7 +102,7 @@ class PayloadBuilder {
     uint8_t addNumber(float value);
 
     /**
-     * Adds a GPS object to the payload buffer
+     * Add a GPS object to the payload buffer.
      *
      * @param latitude :float: can be a range between 3.4028235E+38 and -3.4028235E+38 (4 bytes) value
      * @param longitude :float: can be a range between 3.4028235E+38 and -3.4028235E+38 (4 bytes) value
@@ -113,7 +113,7 @@ class PayloadBuilder {
     uint8_t addGPS(float latitude, float longitude, float altitude);
 
     /**
-     * Adds an addAccelerometer object to the payload buffer
+     * Add an addAccelerometer object to the payload buffer.
      *
      * @param x :float: can be a range between 3.4028235E+38 and -3.4028235E+38 (4 bytes) value
      * @param y :float: can be a range between 3.4028235E+38 and -3.4028235E+38 (4 bytes) value

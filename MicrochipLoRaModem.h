@@ -57,12 +57,11 @@ enum MacTransmitErrorCodes
   TransmissionFailure = 3
 };
 
-// this class represents the ATT cloud platform
 class MicrochipLoRaModem: public LoRaModem
 {
   public:
     /**
-    * Create the modem object
+    * Create the modem object.
     *
     * @param stream the stream object to communicate with the modem over
     * @param monitor a stream object, used to write output data towards
@@ -71,21 +70,21 @@ class MicrochipLoRaModem: public LoRaModem
     MicrochipLoRaModem(SerialType* stream, Stream* monitor = NULL, ATT_CALLBACK_SIGNATURE = NULL);
 
     /**
-     * Returns the required baudrate for the device
+     * Returns the required baudrate for the device.
      *
      * @return an unsigned integer, representing the default baut rate
      */
     unsigned int getDefaultBaudRate();
 
     /**
-     * Stop the modem
+     * Stop the modem.
      *
      * @return true upon success
      */
     bool stop();
     
     /**
-     * Set the modem in LoRaWan mode (vs private networks)
+     * Set the modem in LoRaWan mode (vs private networks).
      *
      * @param adr when true, use adaptive data rate (default)
      *
@@ -94,7 +93,7 @@ class MicrochipLoRaModem: public LoRaModem
     bool setLoRaWan(bool adr = true);
     
     /**
-     * Assign a device address to the modem
+     * Assign a device address to the modem.
      *
      * @param devAddress the device address to used. Must be 4 bytes long
      *
@@ -103,7 +102,7 @@ class MicrochipLoRaModem: public LoRaModem
     bool setDevAddress(const unsigned char* devAddress);
     
     /**
-     * Set the app session key for the modem communication
+     * Set the app session key for the modem communication.
      *  
      * @param appskey the app session key, must be 16 bytes long
      *
@@ -112,7 +111,7 @@ class MicrochipLoRaModem: public LoRaModem
     bool setAppsKey(const unsigned char* appsKey);
     
     /**
-     * Set the network session key
+     * Set the network session key.
      *
      * @param nwksKey the network session key, must be 16 bytes long
      *
@@ -121,7 +120,7 @@ class MicrochipLoRaModem: public LoRaModem
     bool setNWKSKey(const unsigned char*  nwksKey);
     
     /**
-     * Start the modem
+     * Start the modem.
      *
      * @return true upon success
      */
@@ -129,17 +128,15 @@ class MicrochipLoRaModem: public LoRaModem
     
     /**
      * Start the send process, but return before everything is done.
-     * This operation is performed asynchronically, so if an ack is requested,
-     * then the operation is not yet complete when this function returns.
-     * Consecutive ChecSendState() calls should be performed untill the
-     * operation has been completed.
+     * This operation is performed asynchronically. If an ack is requested, the operation is not yet complete when this function returns.
+     * Consecutive `checkSendState()` calls should be performed untill the operation has been completed.
      *
      * @return true if the packet was succesfully send, and the process of waiting for a resonse can begin. Otherwise return false
      */
     bool sendAsync(void* packet, unsigned char size, bool ack = true);
     
     /**
-     * Check the status of the current send operation (if there was any)
+     * Check the status of the current send operation (if there was any).
      *
      * @param sendResult the result of the send operation, if there was still a pending operation
      *
@@ -148,12 +145,12 @@ class MicrochipLoRaModem: public LoRaModem
     bool checkSendState(bool& sendResult);
     
     /**
-     * Process any incoming packets from the modem
+     * Process any incoming packets from the modem.
      */
     void processIncoming();
     
     /**
-     * Extract the specified instrumentation parameter from the modem and return the value
+     * Extract the specified instrumentation parameter from the modem and return the value.
      *
      * @param param the id of the parameter whose value should be returned
      *
@@ -169,27 +166,27 @@ class MicrochipLoRaModem: public LoRaModem
     
     #ifdef ENABLE_SLEEP
     /**
-     * Put the modem in sleep mode for 3 days (use WakeUp if you want to send something earlier)
+     * Put the modem in sleep mode for 3 days (use 'wakeUp' if you want to send something earlier).
      */
     void sleep();
     
     /**
-     * Wake up the device after it has been put the sleep
+     * Wake up the device after it has been put the sleep.
      */
     void wakeUp();
     
     /**
-     * Retrieve the specified parameter from the MicrochipLoRaModem
+     * Retrieve the specified parameter from the MicrochipLoRaModem.
      */
     char* getSysParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);    
     
     /**
-     * Retrieve the specified parameter from the radio
+     * Retrieve the specified parameter from the radio.
      */
     char* getRadioParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
     
     /**
-     * Retrieve the specified parameter from the radio
+     * Retrieve the specified parameter from the radio.
      */
     char* getMacParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
     
@@ -201,12 +198,12 @@ class MicrochipLoRaModem: public LoRaModem
     char inputBuffer[DEFAULT_INPUT_BUFFER_SIZE + 1];
     
     /**
-     * Make certain that we at least try to read the modem response for 'ok' 1 time before timing out
+     * Make certain that we at least try to read the modem response for 'ok' 1 time before timing out.
      */
     bool _triedReadOk;
     
     /**
-     * Store the starting time of the current async operation
+     * Store the starting time of the current async operation.
      */
     unsigned long asyncOperationStart;
     
@@ -217,17 +214,17 @@ class MicrochipLoRaModem: public LoRaModem
     bool expectOK();
 
     /**
-     * Block until the string is found on input or timeout occured
+     * Block until the string is found on input or timeout occured.
      */
     bool expectString(const char* str, unsigned short timeout = DEFAULT_TIMEOUT);
 
     /**
-     * Try to read the string on the input 1 time
+     * Try to read the string on the input 1 time.
      */
     char tryReadString(const char* str);
     
     /**
-     * Try to read the string from teh input until found or untill timeout, do this async, so call many times
+     * Try to read the string from teh input until found or untill timeout, do this async, so call many times.
      */
     char expectStringAsync(const char* str, unsigned short timeout);
     
@@ -236,24 +233,24 @@ class MicrochipLoRaModem: public LoRaModem
     bool setMacParam(const char* paramName, const char* paramValue);
     
     /**
-     * Send and wait for response
+     * Send and wait for response.
      */
     unsigned char macTransmit(const char* type, const unsigned char* payload, unsigned char size);
     
     /**
-     * Send command
+     * Send command.
      */
     void macSendCommand(const char* type, const unsigned char* payload, unsigned char size);
     
     /**
-     * Convert the text value for spreading factor into a number between 0 and 6
+     * Convert the text value for spreading factor into a number between 0 and 6.
      */
     int sfToIndex(char* value);
     
     unsigned char macTransmitGetResponse();
     
     /**
-     * Checks the current input string against the param. Returns true if they match
+     * Checks the current input string against the param. Returns true if they match.
      */
     char checkInputInstring(const char* str);
 };

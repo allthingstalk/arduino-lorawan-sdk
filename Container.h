@@ -26,7 +26,7 @@
 #include <Stream.h>
 #include <ContainerPacket.h>
 
-/**
+/*
  * A helper class for sending data in the proximus-container data format.
  *
  * All data transmissions are performed using the ATTDevice buffer.

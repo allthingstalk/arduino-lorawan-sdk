@@ -44,8 +44,8 @@
 #include <ATT_IOT_LoRaWAN.h>
 
 /*
-  Base class for supported data formats.
-*/
+ * Base class for supported data formats
+ */
 class ContainerPacket
 {
   public:
@@ -64,23 +64,38 @@ class ContainerPacket
   protected:
     ATTDevice* _device;
 
-    // assigns the asset/container id to the packet
+    /**
+     * Assign the asset/container id to the packet.
+     */
     void setId(unsigned char id);
 
-    // resets the content of the packet back to 0 ->> all data will be removed
+    /**
+     * Reset the content of the packet back to 0 ->> all data will be removed.
+     */
     virtual void reset() = 0;
 
-    // get the data size of the packet
+    /**
+     * Get the data size of the packet.
+     */
     virtual unsigned char getDataSize() = 0;
 
-    // writes the packet content to the specified byte array. This must be max 51 to 220 bytes long, depending on spreading factor.
-    // returns: the nr of bytes actually written to the array.
+    /**
+     * Write the packet content to the specified byte array.
+     * This must be max 51 to 220 bytes long, depending on spreading factor.
+     *
+     * @return the nr of bytes actually written to the array
+     */
     virtual unsigned char write(unsigned char* result);
 
-    // returns the frame type number for this lora packet. The default value is 0x40. Inheritors that render other packet types can overwrite this
+    /**
+     * Return the frame type number for this lora packet.
+     * The default value is 0x40. Inheritors that render other packet types can overwrite this.
+     */
     virtual unsigned char getFrameType();
 
-    // calculate the checksum of the packet and return it
+    /**
+     * Calculate the checksum of the packet and return it.
+     */
     unsigned char calculateCheckSum(unsigned char* toSend, short len);
 
   private:

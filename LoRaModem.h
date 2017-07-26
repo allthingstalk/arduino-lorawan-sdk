@@ -40,169 +40,156 @@
 
 
 // callback signature for functions that process data coming from the NSP that were send to the device
-// first param: start of byte array that was found
+// first param : start of byte array that was found
 // second param: the length of the package
 #define ATT_CALLBACK_SIGNATURE void (*callback)(const uint8_t*,unsigned int)
 
 /*
-  base class for modems
-*/
+ * Base class for modems
+ */
 class LoRaModem
 {
   public:
-    /** 
-    Create the modem object.
-    
-    parameters:
-    - monitor: a stream object, used to write output data towards
-    - MQTT_CALLBACK_SIGNATURE: assign a callback function that is called when incoming data (from nsp to device) needs to be processed. Null by default, so no callback will be performed
-    */
+    /**
+     * Create the modem object.
+     *
+     * @param monitor a stream object, used to write output data towards
+     * @param MQTT_CALLBACK_SIGNATURE assign a callback function that is called when incoming data (from nsp to device) needs to be processed. Null by default, so no callback will be performed
+     */
     LoRaModem(Stream *monitor, ATT_CALLBACK_SIGNATURE = NULL);
   
     /**
-    Returns the required baudrate for the device
-    
-    returns: an unsigned integer, representing the default baut rate
-    */
+     * Return the required baudrate for the device
+     *
+     * @return an unsigned integer, representing the default baut rate
+     */
     virtual unsigned int getDefaultBaudRate() = 0;
     
     /**
-    Stop the modem.
-    
-    returns: true upon success
-    */
+     * Stop the modem.
+     *
+     * @return true upon success
+     */
     virtual bool stop() = 0;
     
     /** 
-    Set the modem in LoRaWan mode (versus private networks).
-    
-    parameters:
-    - adr: when true, use adaptive data rate (default)
-    
-    returns: true upon success
-    */
+     * Set the modem in LoRaWan mode (versus private networks).
+     *
+     * @param adr when true, use adaptive data rate (default)
+     *
+     * @return true upon success
+     */
     virtual bool setLoRaWan(bool adr = true) = 0;
     
     /**
-    Assign a device address to the modem.
-    
-    parameters:
-    - devAddress: the device address to used. Must be 4 bytes long
-    
-    returns: true upon success
-    */
+     * Assign a device address to the modem.
+     *
+     * @param devAddress the device address to used. Must be 4 bytes long
+     *
+     * @return true upon success
+     */
     virtual bool setDevAddress(const unsigned char* devAddress) = 0;
     
-    
     /**
-    Set the app session key for the modem communication.
-    
-    parameters:
-    - appskey: the app session key, must be 16 bytes long
-    
-    returns: true upon success
-    */
+     * Set the app session key for the modem communication.
+     *
+     * @param appskey the app session key, must be 16 bytes long
+     *
+     * @return true upon success
+     */
     virtual bool setAppsKey(const unsigned char* appsKey) = 0;
     
     /** set the network session key
-    
-    parameters:
-    - nwksKey: the network session key, must be 16 bytes long
-    
-    returns: true upon success
-    */
+     *
+     * @param nwksKey the network session key, must be 16 bytes long
+     *
+     * @return true upon success
+     */
     virtual bool setNWKSKey(const unsigned char*  nwksKey) = 0;
     
     /**
-    Start the modem.
-    
-    returns: true upon success.
-    */
+     * Start the modem.
+     *
+     * @return true upon success
+     */
     virtual bool start() = 0;
     
     /**
-    Send a data packet to the NSP.
-    
-    This operation is performed synchronically, so if ack is requested, then the function will block untill the base station has responded or the time out has expired.
-    
-    parameters:
-    - data: the byte array or pointer to a structure that needs to be sent
-    - size: the nr of bytes in the data block
-    - ack: when true, an acknowledge is request fromo the base station (default), otherwise no acknowledge is waited for
-    
-    returns: true upon success
-    */
+     * Send a data packet to the NSP.
+     * This operation is performed synchronically. If ack is requested, then the function will block until the base station has responded or the time out has expired.
+     *
+     * @param data the byte array or pointer to a structure that needs to be sent
+     * @param size the nr of bytes in the data block
+     * @param ack when true, an acknowledge is request fromo the base station (default), otherwise no acknowledge is waited for
+     *
+     * @return true upon success
+     */
     virtual bool send(void* packet, unsigned char size, bool ack = true);
     
     /**
-    Start the send process, but return before everything is done.
-    
-    This operation is performed asynchronically, so if an ack is requested, then the operation is not yet complete when this function returns.  Consecutive CheckSendState() calls should be performed untill the operation has been completed.
-    
-    returns: true if the packet was succesfully send, and the process of waiting for a resonse can begin. Otherwise, it returns false
-    */
+     * Start the send process, but return before everything is done.
+     * This operation is performed asynchronically. If an ack is requested, then the operation is not yet complete when this function returns.
+     * Consecutive `checkSendState()` calls should be performed untill the operation has been completed.
+     *
+     * @return true if the packet was succesfully send, and the process of waiting for a resonse can begin. Otherwise return false
+     */
     virtual bool sendAsync(void* packet, unsigned char size, bool ack = true) = 0;
     
     /**
-    Checks the status of the current send operation (if there was any).
-    
-    parameters:
-    - sendResult:  the result of the send operation, if there was still a pending operation
-     
-    returns: if there was none or the operation is done
-    */
+     * Checks the status of the current send operation (if there was any).
+     *
+     * @param sendResult the result of the send operation, if there was still a pending operation
+     *
+     * @return if there was none or the operation is done
+     */
     virtual bool checkSendState(bool& sendResult) = 0;
     
     /**
-    returns: true if the modem can send a payload. If it can't at the moment (still processing another packet), then false is returned
-    */
+     * @return true if the modem can send a payload. False otherwise
+     */
     inline bool isFree(){ return sendState == SENDSTATE_DONE; };
     
     /**
-    Process any incoming packets from the modem.
-    */
+     * Process any incoming packets from the modem.
+     */
     virtual void processIncoming() = 0;
     
     /**
-    Extract the specified instrumentation parameter from the modem and return the value.
-    
-    You don't normally call this function yourself. Instead use the InstrumentationPacket, which is able to display and send all relative parameter values. This function is also used internally to calculated delays between consecutive send operations.
-    
-    parameters:
-    - param: the id of the parameter whose value should be returned
-    
-    returns: the value of the specified parameter
-    */
+     * Extract the specified instrumentation parameter from the modem and return the value.
+     *
+     * @param param the id of the parameter whose value should be returned
+     *
+     * @return the value of the specified parameter
+     */
     virtual int getParam(instrumentationParam param) = 0;
     
     /**
-    returns: the id number of the modem type. See the container definition for the instrumentation container to see more details
-    */
+     * @return the id number of the modem type
+     */
     virtual int getModemId() = 0;
     
-    /**calcualte the max payload size, based on the current spreading factor of the modem. Used to check if the packet can be sent.
-    
-    parameters:
-    - spreading_factor: the spreading factor to calculate the max payload size for
-    
-    returns: the maximum size of the payload for the given spreading factor
-    */
+    /**
+     * Calcualte the max payload size, based on the current spreading factor of the modem. Used to check if the packet can be sent.
+     *
+     * @param spreading_factor the spreading factor to calculate the max payload size for
+     *
+     * @return the maximum size of the payload for the given spreading factor
+     */
     int maxPayloadForSF(short spreading_factor = -1);
 
     /**
-    Calcualte the time on air, based on the current spreading factor and payload size.
-    
-    parameters:
-    - appPayloadSize: the size of the payload to send
-    - spreading_factor: the spreading factor to calculate the max payload size for
-    
-    returns: the time on air
-    */
+     * Calcualte the time on air, based on the current spreading factor and payload size.
+     *
+     * @param appPayloadSize the size of the payload to send
+     * @param spreading_factor the spreading factor to calculate the max payload size for
+     *
+     * @return the time on air
+     */
     float calculateTimeOnAir(unsigned char appPayloadSize, short spreading_factor = -1);
     
     /**
-    Get the current state of the (async) send operation.
-    */
+     * Get the current state of the (async) send operation.
+     */
     char getSendState() {return sendState;};
     
   protected:
