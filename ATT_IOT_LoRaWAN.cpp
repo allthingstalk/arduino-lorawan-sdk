@@ -52,7 +52,7 @@ bool ATTDevice::initABP(const uint8_t* devAddress, const uint8_t* appsKey, const
   PRINT("ATT lib version: "); PRINTLN(VERSION);
   if(!_modem->stop())  // stop any previously running modems
   {
-    PRINTLN("can't communicate with modem: possible hardware issues");
+    PRINTLN("Can't communicate with modem: possible hardware issues");
     return false;
   }
   return checkInitStatus();
@@ -85,24 +85,24 @@ bool ATTDevice::hasKeys()
 bool ATTDevice::checkInitStatus()
 {
   if (!_modem->setLoRaWan(_adr)){  // switch to LoRaWAN mode instead of peer to peer        
-    PRINTLN("can't set adr: possible hardware issues?");
+    PRINTLN("Can't set adr: possible hardware issues?");
     return false;
   }
   if(!_modem->setDevAddress(_devAddress)){
-    PRINTLN("can't assign device address to modem: possible hardware issues?");
+    PRINTLN("Can't assign device address to modem: possible hardware issues?");
     return false;
   }
   if(!_modem->setAppsKey(_appsKey)){
-    PRINTLN("can't assign app session key to modem: possible hardware issues?");
+    PRINTLN("Can't assign app session key to modem: possible hardware issues?");
     return false;
   }
   if(!_modem->setNWKSKey(_nwksKey)){
-    PRINTLN("can't assign network session key to modem: possible hardware issues?");
+    PRINTLN("Can't assign network session key to modem: possible hardware issues?");
     return false;
   }
   bool result = _modem->start();  // start up the modem
   if(result == true){
-    PRINTLN("modem initialized");
+    PRINTLN("Modem initialized");
   }
   else{
     PRINTLN("Parameters loaded, but modem won't start: initialization failed");
@@ -134,13 +134,13 @@ int ATTDevice::processQueue()
     return (int)trySendFront();
   else if(_modem->checkSendState(sendResult) == true){
     if(sendResult == true){  // modem succesfully sent a packet, so remove from queue
-      PRINTLN("modem reported successfull send")
+      PRINTLN("Modem reported successful send")
       _sendFailed = false;
       pop();
       return (int)trySendFront();
     }
     else{
-      PRINTLN("modem reported failed send")
+      PRINTLN("Modem reported failed send")
       _modem->stop();
       _sendFailed = true;
       return -1;
@@ -154,7 +154,7 @@ bool ATTDevice::addToQueue(void* packet, unsigned char size, bool ack)
 {
   // check if the packet is not too big
   if(size > _modem->maxPayloadForSF()){
-    PRINTLN("Data size exceeds limitations for current spreading factor.")
+    PRINTLN("Data size exceeds limitations for current spreading factor")
     return false;
   }
   short nrRetries = 0;
@@ -164,7 +164,7 @@ bool ATTDevice::addToQueue(void* packet, unsigned char size, bool ack)
      (_lastTimeSent != 0 && _lastTimeSent + _minTimeBetweenSend > curTime))  // or it's not yet time to send a new packet
   {
     if(isQueueFull() == true){
-      PRINTLN("buffer is full, can't transmit packet");
+      PRINTLN("Buffer is full. Can't transmit packet");
       return false;
     }
     else{
@@ -194,7 +194,7 @@ void ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
     unsigned long minTime = ceil(toa * 100);  // dynamically adjust
     if(_autoCalMinTime)
       _minTimeBetweenSend = minTime > _minAllowedTimeBetweenSend ? minTime : _minAllowedTimeBetweenSend;
-    PRINT("min delay until next send: ") PRINT(_minTimeBetweenSend) PRINTLN(" ms")
+    PRINT("Min delay until next send: ") PRINT(_minTimeBetweenSend) PRINTLN(" ms")
   }  
 }
 
