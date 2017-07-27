@@ -25,7 +25,7 @@
 #include <Arduino.h>
 
 #define PORT 0x01
-//#define FULLDEBUG
+#define FULLDEBUG
 
 #define PACKET_TIME_OUT 45000
 
@@ -53,18 +53,21 @@ bool MicrochipLoRaModem::stop()
   bool result = true;
   if(!expectString(STR_DEVICE_TYPE_EU) && !checkInputInstring(STR_DEVICE_TYPE_US)){
     #ifdef FULLDEBUG
-      PRINTLN("initial reset failed, starting wakeup sequence");
+      PRINTLN("Initial reset failed, starting wakeup sequence");
     #endif
-    wakeUp();  // try to wakeup the modem and send the messages again. sometimes the modem is just not correctly woken up after a new sketch was loaded
+    
+    // Try to wakeup the modem and send the messages again.
+    // Sometimes the modem is just not correctly woken up after a new sketch was loaded
+    wakeUp();
     #ifdef FULLDEBUG
-      PRINTLN("retrying reset");
+      PRINTLN("Retrying reset");
     #endif
     _stream->print(STR_CMD_RESET);
     _stream->print(CRLF);
     result = expectString(STR_DEVICE_TYPE_EU) || checkInputInstring(STR_DEVICE_TYPE_US);
   }
   if(result){
-    PRINT("modem type: "); 
+    PRINT("Modem type: "); 
     if (strstr(this->inputBuffer, STR_DEVICE_TYPE_EU) != NULL){
       PRINTLN(STR_DEVICE_TYPE_EU);
       }
@@ -162,21 +165,28 @@ void MicrochipLoRaModem::sleep()
   #endif
 }
 
-
 void MicrochipLoRaModem::wakeUp()
 {
-  // "emulate" break condition
+  #ifdef FULLDEBUG
+	PRINTLN("wakeup the modem");
+	#endif
+	// "emulate" break condition
   _stream->flush();
-  _stream->end();
+  //_stream->end();
   _stream->begin(300);
   _stream->write((uint8_t)0x00);
   _stream->flush();
-  _stream->end();
+  //_stream->end();
+
+  delay(50);
 
   // set baudrate
   _stream->begin(getDefaultBaudRate());
   _stream->write((uint8_t)0x55);
   _stream->flush();
+
+  readLn();
+  
 }
 #endif
 
@@ -566,11 +576,6 @@ bool MicrochipLoRaModem::setMacParam(const char* paramName, uint8_t paramValue)
 // paramName should include the trailing space
 bool MicrochipLoRaModem::setMacParam(const char* paramName, const char* paramValue)
 {
-  //PRINT("[setMacParam] ");
-  //PRINT(paramName);
-  //PRINT("= ");
-  //PRINTLN(paramValue);
-
   _stream->print(STR_CMD_SET);
   _stream->print(paramName);
   _stream->print(paramValue);

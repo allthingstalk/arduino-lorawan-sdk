@@ -35,7 +35,7 @@
 #define loraSerial Serial1
 
 MicrochipLoRaModem modem(&loraSerial, &debugSerial);
-ATTDevice device(&modem, &debugSerial);
+ATTDevice device(&modem, &debugSerial, false, 7000);  // minimum time between 2 messages set at 7000 milliseconds
 Container container(device);
 
 void setup() 
@@ -65,6 +65,6 @@ void loop()
   {
     sendValue(counter);
     counter++;
-		sendNextAt = millis() + 900000;  // send every 15 minutes
+		sendNextAt = millis() + 8000;
 	}
 }

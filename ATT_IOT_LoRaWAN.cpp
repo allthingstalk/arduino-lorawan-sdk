@@ -24,10 +24,7 @@
 //#include <arduino.h>  // still required for the 'delay' function
 
 // create the object
-ATTDevice::ATTDevice(LoRaModem* modem, Stream* monitor, bool autoCalMinTime, unsigned int minTime):
-  _minTimeBetweenSend(minTime), 
-  _autoCalMinTime(autoCalMinTime), 
-  _minAllowedTimeBetweenSend(minTime)
+ATTDevice::ATTDevice(LoRaModem* modem, Stream* monitor, bool autoCalMinTime, unsigned int minTime): _minTimeBetweenSend(minTime), _autoCalMinTime(autoCalMinTime), _minAllowedTimeBetweenSend(minTime)
 {
   _modem = modem;
   _monitor = monitor;
@@ -50,11 +47,13 @@ bool ATTDevice::initABP(const uint8_t* devAddress, const uint8_t* appsKey, const
   
   _adr = adr;
   PRINT("ATT lib version: "); PRINTLN(VERSION);
+
   if(!_modem->stop())  // stop any previously running modems
   {
     PRINTLN("Can't communicate with modem: possible hardware issues");
     return false;
   }
+  
   return checkInitStatus();
 }
 
@@ -109,7 +108,6 @@ bool ATTDevice::checkInitStatus()
   }
   return result;
 }
-
 
 // try to send the front message (oldest) in the queue
 bool ATTDevice::trySendFront()
@@ -192,8 +190,10 @@ void ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
     _modem->sendAsync(packet, size, ack);
     _lastTimeSent = millis();
     unsigned long minTime = ceil(toa * 100);  // dynamically adjust
+    
     if(_autoCalMinTime)
       _minTimeBetweenSend = minTime > _minAllowedTimeBetweenSend ? minTime : _minAllowedTimeBetweenSend;
+
     PRINT("Min delay until next send: ") PRINT(_minTimeBetweenSend) PRINTLN(" ms")
   }  
 }
