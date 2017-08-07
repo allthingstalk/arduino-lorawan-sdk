@@ -126,7 +126,7 @@ if(sendState == -1)
 
 ### ACK / Acknowledgement
 
-In both `addToQueue` functions, we can set an extra boolean parameter to enable or disable acknowledgements. By default this is set to _true_. We wait for a response so we are sure our message went through. If set to false, we do not wait for the gateway to respond.
+In both `addToQueue` functions, we can set an extra boolean parameter to enable or disable acknowledgements. By default this is set to _true_. We wait for a response so we are sure our message went through. If set to _false_, we do not wait for a response.
 
 ```
 container.addToQueue(counter, INTEGER_SENSOR, false);  // don't wait for ACK
