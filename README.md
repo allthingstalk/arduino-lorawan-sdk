@@ -1,13 +1,13 @@
 # arduino-lorawan-sdk
 
-This is a SDK by AllThingsTalk that provides connectivity to their cloud through [LoRa radios](https://www.lora-alliance.org/What-Is-LoRa/Technology).  
+This is a SDK by AllThingsTalk that provides connectivity to their cloud through [LoRaWan radios](https://www.lora-alliance.org/What-Is-LoRa/Technology).  
 
 ## Hardware
 
 This SDK has been tested to work with the following hardware
 
 Chip
-- [Microchip](http://www.microchip.com/wwwproducts/Devices.aspx?product=RN2483)
+- [Microchip](http://www.microchip.com/wwwproducts/Devices.aspx?product=RN2483) RN 2483
 
 Board
 - Sodaq Mbili
@@ -98,7 +98,7 @@ Example decoding json
 
 ### Containers
 
-To use the container format, simply define a `Container` object at the start of your sketch.
+To use the container format, simply define a `Container` object at the start of your sketch. It always contains a single data point.
 
 ```
 Container container(device);
@@ -122,4 +122,15 @@ if(sendState == -1)
   device.pop();
 }
 
+```
+
+### ACK / Acknowledgement
+
+In both `addToQueue` functions, we can set an extra boolean parameter to enable or disable acknowledgements. By default this is set to _true_. We wait for a response so we are sure our message went through. If set to false, we do not wait for the gateway to respond.
+
+```
+container.addToQueue(counter, INTEGER_SENSOR, false);  // don't wait for ACK
+```
+```
+payload.addToQueue(false);  // don't wait for ACK
 ```
