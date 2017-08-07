@@ -39,18 +39,6 @@ A third example is included to show how to print out Modem parameters
 
 ## Sending data
 
-### Containers
-
-To use the container format, simply define a `Container` object at the start of your sketch.
-
-```
-Container container(device);
-```
-```
-container.addToQueue(counter, INTEGER_SENSOR, false);
-device.processQueue();
-```
-
 ### Custom binary payload
 
 Using the custom payload builder, you can send data from multiple sources in one payload. Make sure you set the correct decoding file at AllThingsTalk.
@@ -75,7 +63,19 @@ To add more data to your payload, simply use the `addType(value)` functions
 ```
 payload.reset();
 payload.addInteger(counter);
-payload.addToQueue(false);
+payload.addToQueue();
+device.processQueue();
+```
+
+Or a payload consisting of data from multiple sources. Here we have variables holding an integer, booleans and a number.
+
+```
+payload.reset();
+payload.addInteger(counter);
+payload.addBoolean(isRunning);
+payload.addBoolean(isCharging);
+payload.addNumber(temperature);
+payload.addToQueue();
 device.processQueue();
 ```
 
@@ -96,7 +96,19 @@ Example decoding json
 }
 ```
 
-### Handling the queue
+### Containers
+
+To use the container format, simply define a `Container` object at the start of your sketch.
+
+```
+Container container(device);
+```
+```
+container.addToQueue(counter, INTEGER_SENSOR);
+device.processQueue();
+```
+
+### Managing the queue
 
 `processQueue()` will return a number based on the success of sending the message.
 In case of a failure (`-1`), you can remove the message from the queue if wanted using `pop()`.
