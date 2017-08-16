@@ -65,6 +65,6 @@ void loop()
   {
     sendValue(counter);
     counter++;
-		sendNextAt = millis() + 8000;
-	}
+    sendNextAt = millis() + 8000;
+  }
 }
