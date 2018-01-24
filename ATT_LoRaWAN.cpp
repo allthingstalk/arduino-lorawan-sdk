@@ -198,14 +198,6 @@ void ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
   }  
 }
 
-/****
- * Create cbor payload
- */
-void ATTDevice::sendCbor(unsigned char* data, unsigned int size)
-{
-
-}
-
 void ATTDevice::pop()
 {
   if(_front != _back){  // if both are the same there is nothing to pop

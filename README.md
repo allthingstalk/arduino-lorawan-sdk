@@ -17,95 +17,97 @@ Board
 
 Download the source code and copy the content of the zip file to your arduino libraries folder (usually found at /libraries) _or_ import the .zip file directly using the Arduino IDE.
 
-## Examples
+### Settings keys
 
-Two version of a basic example on how to get data to the AllThingsTalk Cloud are included. These examples work for both the Sodaq Mbili and Sodaq ONE. No other hardware required.
-* `counter-containers` counter using preset [container definitions](http://docs.allthingstalk.com/developers/data/default-payload-conversion/)
-* `counter-payload-builder` counter using our [custom binary payload decoding](http://docs.allthingstalk.com/developers/data/custom-payload-conversion/)
-
-A third example is included to show how to print out Modem parameters
-* `instrumentation`
-
-> When running the examples, make sure you (un)comment the correct Serial communication in the sketch
-```
-// Sodaq ONE
-#define debugSerial SerialUSB
-#define loraSerial Serial1
-
-// Sodaq Mbili
-//#define debugSerial Serial
-//#define loraSerial Serial1
-```
-
-## Sending data
-
-### Custom binary payload
-
-Using the custom payload builder, you can send data from multiple sources in one payload. Make sure you set the correct decoding file at AllThingsTalk.
-For more information, please visit [custom-payload-conversion](http://docs.allthingstalk.com/developers/data/custom-payload-conversion/) in our documentation.
-
-To use the custom payload format, simply define a `PayloadBuilder` object at the start of your sketch.
+Open the `keys.h` file and fill in your device credentials. You can copy paste them from your device at AllThingsTalk in the _SETTINGS > Connectivity_ tab.
 
 ```
-PayloadBuilder payload(device);
+#ifndef KEYS_h
+#define KEYS_h
+
+uint8_t DEV_ADDR[4] = {0x01, 0xD8, ..., ...};
+uint8_t APPSKEY[16] = {0x38, 0x4F, 0x94, 0x1B, 0x30, 0xFE, 0xF3, 0xF5, ..., ..., ..., 0x9A, 0x80, 0xC1, 0x9B, 0x3E};
+uint8_t NWKSKEY[16] = {0x66, 0x3F, 0xB3, 0x67, 0xFF, 0xE2, 0x4E, 0x71, ..., ..., ..., 0x2B, 0x24, 0xF1, 0x77, 0x45};
+
+#endif
 ```
 
-To add more data to your payload, simply use the `addType(value)` functions
+### Payloads
 
-* `addBoolean(uint8_t value)`
-* `addInteger(int value)`
-* `addNumber(float value)`
-* `addGPS(float latitude, float longitude, float altitude)`
-* `addAccelerometer(float x, float y, float z)`
+There are three ways to send your data to AllThingsTalk
 
-> Reset the payload before building a new one!
+* `Standardized containers`
+* `Cbor payload`
+* `Binary payload`
 
-```
-payload.reset();
-payload.addInteger(counter);
-payload.addToQueue();
-device.processQueue();
-```
+Containers will send a single datapoint to a single asset. Both _Cbor_ and _Binary_ allow you to construct your own payload. The former is slightly larger in size, the latter requires a small decoding file [(example)](https://github.com/allthingstalk/arduino-lorawan-sdk/blob/master/examples/counter/counter-payload-builder.json) on the receiving end.
 
-Or a payload consisting of data from multiple sources. Here we have variables holding an integer, booleans and a number.
+#### Containers
+
+Send a single datapoint to a single asset using the `send(value, asset)` functions. Value can be any primitive type `integer`, `float`, `boolean` or `String`. For example
 
 ```
-payload.reset();
-payload.addInteger(counter);
-payload.addBoolean(isRunning);
-payload.addBoolean(isCharging);
-payload.addNumber(temperature);
-payload.addToQueue();
-device.processQueue();
-```
-
-> Set the correct decoding file at AllThingsTalk so your data is decoded correctly.
-
-Example decoding json
-
-> Make sure you have an `integer` asset with the correct **name** (the name you set in the decoding json) under your device in AllThingsTalk
-
-```
-{
-  "sense": [
-    {
-      "asset": "counter",
-      "value": {"byte": 0, "type": "integer"}
-    }
-  ]
-}
-```
-
-### Containers
-
-To use the container format, simply define a `Container` object at the start of your sketch. It always contains a single data point.
-
-```
+ATTDevice device(&modem, &debugSerial, false);
 Container container(device);
 ```
 ```
-container.addToQueue(counter, INTEGER_SENSOR);
-device.processQueue();
+  container.addToQueue(counter, INTEGER_SENSOR, false);
+```
+
+#### Cbor
+
+```
+ATTDevice device(&modem, &debugSerial, false);
+CborBuilder payload(device);  // Construct a payload object
+```
+```
+  payload.reset();
+  payload.map(1);  // Set number of datapoints in payload
+  payload.addInteger(25, "15");
+  payload.send();
+```
+
+#### Binary payload
+
+Using the [AllThingsTalk ABCL language](http://docs.allthingstalk.com/developers/custom-payload-conversion/), you can send a binary string containing datapoints of multiple assets in a single message. The example below shows how you can easily construct and send your own custom payload.
+
+> Make sure you set the correct decoding file at AllThingsTalk. Please check our documentation and the included experiments for examples.
+
+```
+ATTDevice device(&modem, &debugSerial, false);
+PayloadBuilder payload(device);  // Construct a payload object
+```
+```
+  payload.reset();
+  payload.addInteger(25);
+  payload.addNumber(false);
+  payload.addNumber(3.1415926);
+  payload.send();
+```
+
+### Examples
+
+Basic example showing all fundamental parts to set up a working example. Send data from the device, over NB-IoT to AllThingsTalk.
+
+* `counter` This example shows how you can send over a simple integer counter using either _json_, _cbor_ or a _binary payload_.
+
+Simply uncomment your selected method for sending data at the top of the sketch.
+
+```
+// Uncomment your selected method for sending data
+#define CONTAINERS
+//#define CBOR
+//#define BINARY
+```
+
+* `instrumentation` Print out Modem parameters
+
+> When running the examples, make sure you select the correct hardware at the top of the sketch.
+
+```
+// Select your hardware
+#define SODAQ_MBILI
+//#define SODAQ_ONE
 ```
 
 ### Managing the queue
@@ -126,7 +128,7 @@ if(sendState == -1)
 
 ### ACK / Acknowledgement
 
-In both `addToQueue` functions, we can set an extra boolean parameter to enable or disable acknowledgements. By default this is set to _true_. We wait for a response so we are sure our message went through. If set to _false_, we do not wait for a response.
+In all `addToQueue` functions, we can set an extra boolean parameter to enable or disable acknowledgements. By default this is set to _true_. We wait for a response so we are sure our message went through. If set to _false_, we do not wait for a response.
 
 ```
 container.addToQueue(counter, INTEGER_SENSOR, false);  // don't wait for ACK

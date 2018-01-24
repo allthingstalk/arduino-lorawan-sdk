@@ -20,9 +20,17 @@
  */
  
 // Uncomment your selected method for sending data
-#define CONTAINERS
-//#define CBOR
+//#define CONTAINERS
+#define CBOR
 //#define BINARY
+
+// Select your hardware
+#define SODAQ_MBILI
+//#define SODAQ_ONE
+
+/***************************************************************************/
+
+
 
 #include <ATT_LoRaWAN.h>
 #include "keys.h"
@@ -30,13 +38,15 @@
 
 #define SERIAL_BAUD 57600
 
-// Sodaq ONE
-//#define debugSerial SerialUSB
-//#define loraSerial Serial1
+#ifdef SODAQ_ONE
+  #define debugSerial SerialUSB
+  #define loraSerial Serial1
+#endif
 
-// Sodaq Mbili
-#define debugSerial Serial
-#define loraSerial Serial1
+#ifdef SODAQ_MBILI
+  #define debugSerial Serial
+  #define loraSerial Serial1
+#endif
 
 MicrochipLoRaModem modem(&loraSerial, &debugSerial);
 ATTDevice device(&modem, &debugSerial, false, 7000);  // minimum time between 2 messages set at 7000 milliseconds
@@ -44,6 +54,11 @@ ATTDevice device(&modem, &debugSerial, false, 7000);  // minimum time between 2 
 #ifdef CONTAINERS
   #include <Container.h>
   Container container(device);
+#endif
+
+#ifdef CBOR
+  #include <CborBuilder.h>
+  CborBuilder payload(device);
 #endif
 
 #ifdef BINARY
@@ -68,6 +83,13 @@ void sendValue(int16_t counter)
   #ifdef CONTAINERS
   container.addToQueue(counter, INTEGER_SENSOR, false);  
   #endif
+  
+  #ifdef CBOR
+  payload.reset();
+  payload.map(1);
+  payload.addInteger(counter, "15");
+  payload.addToQueue(false);
+  #endif
 
   #ifdef BINARY  
   payload.reset();
@@ -86,6 +108,6 @@ void loop()
   {
     sendValue(counter);
     counter++;
-    sendNextAt = millis() + 8000;
+    sendNextAt = millis() + 30000;
   }
 }

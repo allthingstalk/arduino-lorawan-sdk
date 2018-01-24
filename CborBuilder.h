@@ -36,7 +36,7 @@ class CborBuilder {
     unsigned int getSize();
 
     void reset();
-    void send();
+    void addToQueue(bool ack);
 
     // Method to construct a custom cbor payload
     void addBoolean(bool value, const String asset);

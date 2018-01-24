@@ -120,7 +120,10 @@ class ATTDevice
      */
     int processQueue();
     
-    void sendCbor(unsigned char* data, unsigned int size);
+    /**
+     * Send data to modem for transmission
+     */
+    void sendASync(void* data, unsigned char size, bool ack);
     
     /**
      * remove the current message at the front of the queue, if there is still data in the buffer
@@ -160,11 +163,6 @@ class ATTDevice
     bool _adr;
     
     void push(void* data, unsigned char size, bool ack = true);
-    
-    /**
-     * Send data to modem for transmission
-     */
-    void sendASync(void* data, unsigned char size, bool ack);
     
     /**
      * Send the payload at the front of the queue, if there is any and if it's within the allowed time frame

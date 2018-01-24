@@ -52,9 +52,9 @@ void CborBuilder::reset()
   this->offset = 0;
 }
 
-void CborBuilder::send()
+void CborBuilder::addToQueue(bool ack)
 {
-  _attdevice->sendCbor(buffer, offset);
+  _attdevice->sendASync(buffer, offset, ack);
 }
 
 void CborBuilder::addBoolean(bool value, const String asset)
