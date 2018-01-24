@@ -41,7 +41,7 @@
 #define NUMBER_SENSOR ((short)16)
 
 #include <Stream.h>
-#include <ATT_IOT_LoRaWAN.h>
+#include <ATT_LoRaWAN.h>
 
 /*
  * Base class for supported data formats

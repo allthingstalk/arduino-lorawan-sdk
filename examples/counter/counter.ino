@@ -18,11 +18,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+// Uncomment your selected method for sending data
+#define CONTAINERS
+//#define CBOR
+//#define BINARY
 
-#include <ATT_IOT_LoRaWAN.h>
+#include <ATT_LoRaWAN.h>
 #include "keys.h"
 #include <MicrochipLoRaModem.h>
-#include <PayloadBuilder.h>
 
 #define SERIAL_BAUD 57600
 
@@ -37,7 +41,15 @@
 MicrochipLoRaModem modem(&loraSerial, &debugSerial);
 ATTDevice device(&modem, &debugSerial, false, 7000);  // minimum time between 2 messages set at 7000 milliseconds
 
-PayloadBuilder payload(device);
+#ifdef CONTAINERS
+  #include <Container.h>
+  Container container(device);
+#endif
+
+#ifdef BINARY
+  #include <PayloadBuilder.h>
+  PayloadBuilder payload(device);
+#endif
 
 void setup() 
 {
@@ -51,16 +63,22 @@ void setup()
   debugSerial.println("Ready to send data");
 }
 
-void sendValue(int counter)
+void sendValue(int16_t counter)
 {
+  #ifdef CONTAINERS
+  container.addToQueue(counter, INTEGER_SENSOR, false);  
+  #endif
+
+  #ifdef BINARY  
   payload.reset();
   payload.addInteger(counter);
   payload.addToQueue(false);
+  #endif
   
   device.processQueue();
 }
 
-int counter = 0;
+int16_t counter = 0;
 unsigned long sendNextAt = 0;
 void loop() 
 {
@@ -68,6 +86,6 @@ void loop()
   {
     sendValue(counter);
     counter++;
-		sendNextAt = millis() + 8000;
-	}
+    sendNextAt = millis() + 8000;
+  }
 }

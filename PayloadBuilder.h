@@ -23,7 +23,7 @@
 #define PayloadBuilder_h
 
 #include <Arduino.h>
-#include <ATT_IOT_LoRaWAN.h>
+#include <ATT_LoRaWAN.h>
 
 // Data type + size in bytes
 #define ATTALK_BOOLEAN_SIZE 1

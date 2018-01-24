@@ -120,6 +120,8 @@ class ATTDevice
      */
     int processQueue();
     
+    void sendCbor(unsigned char* data, unsigned int size);
+    
     /**
      * remove the current message at the front of the queue, if there is still data in the buffer
      */

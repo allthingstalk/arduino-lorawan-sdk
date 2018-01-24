@@ -19,7 +19,7 @@
  * limitations under the License.
  */
 
-#include <ATT_IOT_LoRaWAN.h>
+#include <ATT_LoRaWAN.h>
 #include "Utils.h"
 //#include <arduino.h>  // still required for the 'delay' function
 
@@ -196,6 +196,14 @@ void ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
 
     PRINT("Min delay until next send: ") PRINT(_minTimeBetweenSend) PRINTLN(" ms")
   }  
+}
+
+/****
+ * Create cbor payload
+ */
+void ATTDevice::sendCbor(unsigned char* data, unsigned int size)
+{
+
 }
 
 void ATTDevice::pop()
