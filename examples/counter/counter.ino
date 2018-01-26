@@ -4,7 +4,7 @@
  * /_/ \_\_|_| |_| |_||_|_|_||_\__, /__/ |_|\__,_|_|_\_\ |___/___/|_|\_\
  *                             |___/
  *
- * Copyright 2017 AllThingsTalk
+ * Copyright 2018 AllThingsTalk
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,20 +68,31 @@ ATTDevice device(&modem, &debugSerial, false, 7000);  // minimum time between 2 
 
 void setup() 
 {
-  delay(3000);
-  
   debugSerial.begin(SERIAL_BAUD);
-  loraSerial.begin(modem.getDefaultBaudRate());  // init the baud rate of the serial connection so that it's ok for the modem
-  while((!debugSerial) && (millis()) < 30000){}
+  while((!debugSerial) && (millis()) < 10000){}  // wait until the serial bus is available
+  
+  loraSerial.begin(modem.getDefaultBaudRate());  // set baud rate of the serial connection to match the modem
+  while((!loraSerial) && (millis()) < 10000){}   // wait until the serial bus is available
   
   while(!device.initABP(DEV_ADDR, APPSKEY, NWKSKEY));
   debugSerial.println("Ready to send data");
 }
 
+void process()
+{
+  while(device.processQueue() > 0)
+  {
+    debugSerial.print("QueueCount: ");
+    debugSerial.println(device.queueCount());
+    delay(10000);
+  }
+}
+
 void sendValue(int16_t counter)
 {
   #ifdef CONTAINERS
-  container.addToQueue(counter, INTEGER_SENSOR, false);  
+  container.addToQueue(counter, INTEGER_SENSOR, false);
+  process();
   #endif
   
   #ifdef CBOR
@@ -89,18 +100,18 @@ void sendValue(int16_t counter)
   payload.map(1);
   payload.addInteger(counter, "15");
   payload.addToQueue(false);
+  process();
   #endif
 
   #ifdef BINARY  
   payload.reset();
   payload.addInteger(counter);
   payload.addToQueue(false);
+  process();
   #endif
-  
-  device.processQueue();
 }
 
-int16_t counter = 0;
+short counter = 0;
 unsigned long sendNextAt = 0;
 void loop() 
 {

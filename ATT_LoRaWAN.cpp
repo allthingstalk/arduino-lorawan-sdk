@@ -83,7 +83,7 @@ bool ATTDevice::hasKeys()
 
 bool ATTDevice::checkInitStatus()
 {
-  if (!_modem->setLoRaWan(_adr)){  // switch to LoRaWAN mode instead of peer to peer        
+  if (!_modem->setLoRaWan(_adr)){  // switch to LoRaWAN mode instead of peer to peer
     PRINTLN("Can't set adr: possible hardware issues?");
     return false;
   }
@@ -180,7 +180,7 @@ bool ATTDevice::addToQueue(void* packet, unsigned char size, bool ack)
 void ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
 {
   // calculate for current settings, before send
-  float toa = _modem->calculateTimeOnAir(size);  
+  float toa = _modem->calculateTimeOnAir(size);
   bool canSend = true;     // if the modem doesn't respond to the reconnect, don't try to send
   if(_sendFailed == true)  // restart the modem if a previous send had failed. This connects us back to the base station
     canSend = checkInitStatus();
