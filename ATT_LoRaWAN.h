@@ -123,7 +123,7 @@ class ATTDevice
     /**
      * Send data to modem for transmission
      */
-    void sendASync(void* data, unsigned char size, bool ack);
+    bool sendASync(void* data, unsigned char size, bool ack);
     
     /**
      * remove the current message at the front of the queue, if there is still data in the buffer
@@ -144,6 +144,11 @@ class ATTDevice
      * Get the nr of items currently in the queue
      */
     inline unsigned char queueCount(){ if(_back > _front) return _back - _front; else return _front - _back;};
+    
+        /**
+     * Set up initial connection and/or trying to reconnect
+     */
+    bool checkInitStatus();
     
   private:  
     unsigned long _minTimeBetweenSend;
@@ -174,11 +179,6 @@ class ATTDevice
      * Check if keys are filled in
      */
     bool hasKeys();
-    
-    /**
-     * Set up initial connection and/or trying to reconnect
-     */
-    bool checkInitStatus();
 };
 
 #endif

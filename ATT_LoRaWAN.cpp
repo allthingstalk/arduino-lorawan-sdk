@@ -48,12 +48,6 @@ bool ATTDevice::initABP(const uint8_t* devAddress, const uint8_t* appsKey, const
   _adr = adr;
   PRINT("ATT lib version: "); PRINTLN(VERSION);
 
-  if(!_modem->stop())  // stop any previously running modems
-  {
-    PRINTLN("Can't communicate with modem: possible hardware issues");
-    return false;
-  }
-  
   return checkInitStatus();
 }
 
@@ -83,6 +77,12 @@ bool ATTDevice::hasKeys()
 
 bool ATTDevice::checkInitStatus()
 {
+  if(!_modem->stop())  // stop any previously running modems
+  {
+    PRINTLN("Can't communicate with modem: possible hardware issues");
+    return false;
+  }
+  
   if (!_modem->setLoRaWan(_adr)){  // switch to LoRaWAN mode instead of peer to peer
     PRINTLN("Can't set adr: possible hardware issues?");
     return false;
@@ -172,12 +172,12 @@ bool ATTDevice::addToQueue(void* packet, unsigned char size, bool ack)
   }
   else{
     push(packet, size, ack);
-    sendASync(packet, size, ack);
-    return true;
+    return sendASync(packet, size, ack);
+    //return true;
   }
 }
 
-void ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
+bool ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
 {
   // calculate for current settings, before send
   float toa = _modem->calculateTimeOnAir(size);
@@ -187,7 +187,7 @@ void ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
 
   if(canSend){
     PRINT("TOA: ") PRINTLN(toa)
-    _modem->sendAsync(packet, size, ack);
+    bool ackn = _modem->sendAsync(packet, size, ack);
     _lastTimeSent = millis();
     unsigned long minTime = ceil(toa * 100);  // dynamically adjust
     
@@ -195,6 +195,7 @@ void ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
       _minTimeBetweenSend = minTime > _minAllowedTimeBetweenSend ? minTime : _minAllowedTimeBetweenSend;
 
     PRINT("Min delay until next send: ") PRINT(_minTimeBetweenSend) PRINTLN(" ms")
+    return ackn;
   }  
 }
 

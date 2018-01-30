@@ -42,6 +42,15 @@ There are three ways to send your data to AllThingsTalk
 
 Containers will send a single datapoint to a single asset. Both _Cbor_ and _Binary_ allow you to construct your own payload. The former is slightly larger in size, the latter requires a small decoding file [(example)](https://github.com/allthingstalk/arduino-lorawan-sdk/blob/master/examples/counter/counter-payload-builder.json) on the receiving end.
 
+You can simply select the method you prefer by (un)commenting the methods at the start of the sketch.
+
+```
+// Select your preferred method of sending data
+//#define CONTAINERS
+#define CBOR
+//#define BINARY
+```
+
 #### Containers
 
 Send a single datapoint to a single asset using the `send(value, asset)` functions. Value can be any primitive type `integer`, `float`, `boolean` or `String`. For example

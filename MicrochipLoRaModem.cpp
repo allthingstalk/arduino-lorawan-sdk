@@ -25,7 +25,7 @@
 #include <Arduino.h>
 
 #define PORT 0x01
-//#define FULLDEBUG
+#define FULLDEBUG
 
 #define PACKET_TIME_OUT 45000
 
