@@ -78,7 +78,7 @@ void CborBuilder::addNumber(double value, const String asset)
   addNumber(value);
 }
 
-void CborBuilder::addGps(double latitude, double longitude, double altitude, const String asset)
+void CborBuilder::addGPS(double latitude, double longitude, double altitude, const String asset)
 {
   writeString(asset);
   map(3);

@@ -43,7 +43,7 @@ class CborBuilder {
     void addInteger(int value, const String asset);
     void addNumber(double number, const String asset);
     void addString(const String value, const String asset);
-    void addGps(double latitude, double longitude, double altitude, const String asset);
+    void addGPS(double latitude, double longitude, double altitude, const String asset);
 
     void map(const unsigned int size);
 
