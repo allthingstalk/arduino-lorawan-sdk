@@ -2,6 +2,12 @@
 
 This is a SDK by AllThingsTalk that provides connectivity to their cloud through [LoRaWan radios](https://www.lora-alliance.org/What-Is-LoRa/Technology).  
 
+### Version v2.1
+
+What's new?
+
+* Support for CBOR messages
+
 ## Hardware
 
 This SDK has been tested to work with the following hardware
