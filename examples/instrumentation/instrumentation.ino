@@ -1,4 +1,4 @@
-*    _   _ _ _____ _    _              _____     _ _     ___ ___  _  __
+/*    _   _ _ _____ _    _              _____     _ _     ___ ___  _  __
  *   /_\ | | |_   _| |_ (_)_ _  __ _ __|_   _|_ _| | |__ / __|   \| |/ /
  *  / _ \| | | | | | ' \| | ' \/ _` (_-< | |/ _` | | / / \__ \ |) | ' <
  * /_/ \_\_|_| |_| |_||_|_|_||_\__, /__/ |_|\__,_|_|_\_\ |___/___/|_|\_\
@@ -33,7 +33,7 @@
 
 MicrochipLoRaModem modem(&loraSerial, &debugSerial);
 
-void setup() 
+void setup()
 {
   debugSerial.begin(SERIAL_BAUD);                // set baud rate of the default serial debug connection
   while((!debugSerial) && (millis()) < 10000){}  // wait until serial bus is available, so we get the correct logging on screen. If no serial, then blocks for 2 seconds before run
@@ -43,7 +43,7 @@ void setup()
 
   delay(3000);
   printInstrumentation();
-  
+
   debugSerial.println();
   debugSerial.println("-- Program end --");
 }
@@ -63,11 +63,11 @@ void printInstrumentation()
   debugSerial.print("Adaptive data rate: "); debugSerial.println(modem.getMacParam("adr"));
   debugSerial.print("Data rate for nex transmission: "); debugSerial.println(modem.getMacParam("dr"));
   debugSerial.print("Status: "); debugSerial.println(modem.getMacParam("status"));
-  
+
   debugSerial.println();
   debugSerial.println("RADIO Parameters: ");
   debugSerial.println("----------------- ");
-  
+
   debugSerial.print("Spreading factor: "); debugSerial.println(modem.getRadioParam("sf"));
   debugSerial.print("Modulation Mode: "); debugSerial.println(modem.getRadioParam("mod"));
   debugSerial.print("Operating Frequency: "); debugSerial.println(modem.getRadioParam("freq"));

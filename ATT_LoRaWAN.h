@@ -40,13 +40,13 @@
 
 #define VERSION "2.0"
 
-#define QUEUESIZE 15                  
+#define QUEUESIZE 15
 
 /////////////////////////////////////////////////////////////
 
 
 /**
- * This class provides buffered, asynchronous data transmission features.  
+ * This class provides buffered, asynchronous data transmission features.
  *
  * The buffer (a queue) allows the application to gracefully handle situations where the lora network does
  * not yet allow the device to send data or when the network connection has been temporarily lost.
@@ -56,7 +56,7 @@
  * The size of the queue is determined by a 'define' called QUEUESIZE. It's default value is 15.
  *
  * To use this class:
- * - create an instance and 
+ * - create an instance and
  * - call the Connect() function in order to establish a connection with the NSP.
  * - use addToQueue() to add a packet to the queue. It is then sent to the NSP at the earliest convenience.
  * - regularly call ProcessQueue() or 'ProcessQueuePopFailed' to make certain that any pending actions are processed.
@@ -79,7 +79,7 @@ class ATTDevice
      * @param minTime if `autoCalMinTime` is false, this value indicates the fixed minimum time between 2 messages. Expressed in milli seconds (default is 10000 millseconds). If `autoCalMinTime` is true, this is the minimum time that the system can't go below (important for some systems where the minimum delay can be 6 sec, but not all nsp's allow this)
      */
     ATTDevice(LoRaModem* modem, Stream* monitor = NULL, bool autoCalMinTime=true, unsigned int minTime=MIN_TIME_BETWEEN_SEND);
-    
+
     /**
      * Configure the modem for ABP mode with the device address, app session key and network session key
      *
@@ -87,12 +87,28 @@ class ATTDevice
      * @param appKey the app session key, as provided by the NSP
      * @param nwksKey the network session key, as provided by the NSP
      * @param adr when true, adaptive data rate is used (default)
-     *    
+     *
      * @return true when the operation was successfully performed, otherwise false
      *
      * > Even if this function returns true, this does not yet mean you are already in contact with a base station. It only means that the modem was succesfully configured with the provided parameters and an abp request has been made. The library will however automatically try to reconnect using abp mode when there was a problem with the connection.
      */
     bool initABP(const uint8_t* devAddress, const uint8_t* appsKey, const uint8_t*  nwksKey, bool adr = true);
+
+	/**
+     * Configure the modem for OTAA mode with the device address, app session key and network session key
+     *
+     * @param devEUI the device eui, as provided by the NSP
+     * @param appsEUI the app eui key, as provided by the NSP
+     * @param appsKey the app session key, as provided by the NSP
+     * @param adr when true, adaptive data rate is used (default)
+     *
+     * @return true when the operation was successfully performed, otherwise false
+     *
+     * > Even if this function returns true, this does not yet mean you are already in contact with a base station. It only means that the modem was succesfully configured with the provided parameters and an abp request has been made. The library will however automatically try to reconnect using abp mode when there was a problem with the connection.
+     */
+    bool initOTAA(const uint8_t* devEUI, const uint8_t* appsEUI, const uint8_t* appKey, bool adr = true);
+
+	bool init(const char* activation, const uint8_t* dev, const uint8_t* ntwKeyOrAppEUI, const uint8_t* appsKey, bool adr);
 
     /**
      * Send the specified payload to the NSP
@@ -107,50 +123,51 @@ class ATTDevice
      * @return true when the packet has been buffered, or the transmission has begun. Use processQueue or ProcessQueuePopFailed to get the result of the transmission
      */
     bool addToQueue(void* data, unsigned char size, bool ack = true);
-    
+
     /**
-     * Instruct the system to process any incomming responses from the base station and to try and send a message from it's queue, if there are any and if the system is ready for transmission 
-     * 
+     * Instruct the system to process any incomming responses from the base station and to try and send a message from it's queue, if there are any and if the system is ready for transmission
+     *
      * If the modem reports a failed transmission, then the system will keep the message in it's buffer and try to resend it in the next time slot.
-     *     
+     *
      * @return
      * - `0`: no more items on to process, all is done
      * - `1`: still items to be processed, call this function again
      * - `-1`: the message currently on top failed transmission: if you want to disgard it, remove it manually with pop, otherwise the system will try to resend the payload
      */
-    int processQueue();
-    
+    int processQueue(uint8_t port = 1);
+
     /**
      * Send data to modem for transmission
      */
     bool sendASync(void* data, unsigned char size, bool ack);
-    
+
     /**
      * remove the current message at the front of the queue, if there is still data in the buffer
      */
     void pop();
-    
+
     /**
      * @return true if the queue is empty
      */
     inline bool isQueueEmpty() { return _front == _back; };
-    
+
     /**
      * @return true if the queue is full
      */
     inline bool isQueueFull() { return _front - 1 == _back  || (_front == 0 && _back == QUEUESIZE - 1); };
-    
+
     /**
      * Get the nr of items currently in the queue
      */
     inline unsigned char queueCount(){ if(_back > _front) return _back - _front; else return _front - _back;};
-    
+
         /**
      * Set up initial connection and/or trying to reconnect
      */
-    bool checkInitStatus();
-    
-  private:  
+    bool checkInitStatus(const char* activation);
+
+
+  private:
     unsigned long _minTimeBetweenSend;
     unsigned long _minAllowedTimeBetweenSend;
     unsigned long _lastTimeSent;  // the last time that a message was sent, so we can block sending if user calls send to quickly
@@ -161,24 +178,32 @@ class ATTDevice
     char _back;
     bool _sendFailed;
     bool _autoCalMinTime;
-    
+
+	const uint8_t* _devEUI;
     const uint8_t* _devAddress;
     const uint8_t* _appsKey;
+	const uint8_t* _appKey;
     const uint8_t* _nwksKey;
+	const uint8_t* _appsEUI;
+
+	const char* _activation;
     bool _adr;
-    
+	uint8_t _port;
+
+	bool _isRN2903;
+
     void push(void* data, unsigned char size, bool ack = true);
-    
+
     /**
      * Send the payload at the front of the queue, if there is any and if it's within the allowed time frame
      * @return true if there is still more work to be done. False if there was no more front to be sent
      */
     bool trySendFront();
-    
+
     /**
      * Check if keys are filled in
      */
-    bool hasKeys();
+    bool hasKeys(const char* activation);
 };
 
 #endif

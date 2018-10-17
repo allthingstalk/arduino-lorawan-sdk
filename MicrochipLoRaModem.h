@@ -82,7 +82,7 @@ class MicrochipLoRaModem: public LoRaModem
      * @return true upon success
      */
     bool stop();
-    
+
     /**
      * Set the modem in LoRaWan mode (vs private networks).
      *
@@ -91,7 +91,16 @@ class MicrochipLoRaModem: public LoRaModem
      * @return true upon success
      */
     bool setLoRaWan(bool adr = true);
-    
+
+	/**
+     * Set the modem in LoRaWan mode (vs private networks).
+     *
+     * @param adr when true, use adaptive data rate (default)
+     *
+     * @return true upon success
+     */
+    bool setLoRaSF(int spreadingFactor = 9);
+
     /**
      * Assign a device address to the modem.
      *
@@ -100,16 +109,34 @@ class MicrochipLoRaModem: public LoRaModem
      * @return true upon success
      */
     bool setDevAddress(const unsigned char* devAddress);
-    
+
+	/**
+     * Assign a device EUI to the modem.
+     *
+     * @param devEui the device address to used. Must be 4 bytes long
+     *
+     * @return true upon success
+     */
+    bool setDevEUI(const unsigned char* devEui);
+
     /**
      * Set the app session key for the modem communication.
-     *  
+     *
      * @param appskey the app session key, must be 16 bytes long
      *
      * @return true upon success
      */
     bool setAppsKey(const unsigned char* appsKey);
-    
+
+	/**
+     * Set the app  key for the modem communication.
+     *
+     * @param appkey the app session key, must be 16 bytes long
+     *
+     * @return true upon success
+     */
+    bool setAppKey(const unsigned char* appKey);
+
     /**
      * Set the network session key.
      *
@@ -118,14 +145,23 @@ class MicrochipLoRaModem: public LoRaModem
      * @return true upon success
      */
     bool setNWKSKey(const unsigned char*  nwksKey);
-    
+
+	/**
+     * Set the apps eui session key.
+     *
+     * @param appsEUI the application EUI key, must be 8 bytes long
+     *
+     * @return true upon success
+     */
+    bool setAppEUI(const unsigned char*  appsEUI);
+
     /**
      * Start the modem.
      *
      * @return true upon success
      */
-    bool start();
-    
+    bool start(const char* activation);
+
     /**
      * Start the send process, but return before everything is done.
      * This operation is performed asynchronically. If an ack is requested, the operation is not yet complete when this function returns.
@@ -133,8 +169,8 @@ class MicrochipLoRaModem: public LoRaModem
      *
      * @return true if the packet was succesfully send, and the process of waiting for a resonse can begin. Otherwise return false
      */
-    bool sendAsync(void* packet, unsigned char size, bool ack = true);
-    
+    bool sendAsync(void* packet, unsigned char size, bool ack = true, uint8_t port = 1);
+
     /**
      * Check the status of the current send operation (if there was any).
      *
@@ -143,12 +179,12 @@ class MicrochipLoRaModem: public LoRaModem
      * @return true if there was no pending send operation or the operation is done
      */
     bool checkSendState(bool& sendResult);
-    
+
     /**
      * Process any incoming packets from the modem.
      */
     void processIncoming();
-    
+
     /**
      * Extract the specified instrumentation parameter from the modem and return the value.
      *
@@ -157,56 +193,60 @@ class MicrochipLoRaModem: public LoRaModem
      * @return the value of the specified parameter
      */
     int getParam(instrumentationParam param);
-        
+
     /**
      * Returns the id number of the modem type.
      * See the container definition for the instrumentation container to see more details.
      */
     int getModemId();
-    
+
     #ifdef ENABLE_SLEEP
     /**
      * Put the modem in sleep mode for 3 days (use 'wakeUp' if you want to send something earlier).
      */
     void sleep();
-    
+
     /**
      * Wake up the device after it has been put the sleep.
      */
     void wakeUp();
-    
+
     /**
      * Retrieve the specified parameter from the MicrochipLoRaModem.
      */
-    char* getSysParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);    
-    
+    char* getSysParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
+
     /**
      * Retrieve the specified parameter from the radio.
      */
     char* getRadioParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
-    
+
     /**
      * Retrieve the specified parameter from the radio.
      */
     char* getMacParam(const char* paramName, unsigned short timeout = DEFAULT_TIMEOUT);
-    
+
     #endif
-    
+
   private:
     Stream *_monitor;
     SerialType* _stream;  // the stream to communicate with the lora modem
     char inputBuffer[DEFAULT_INPUT_BUFFER_SIZE + 1];
-    
+
     /**
      * Make certain that we at least try to read the modem response for 'ok' 1 time before timing out.
      */
     bool _triedReadOk;
-    
+
+	bool _isRN2903;
+
+	uint8_t _port;
+
     /**
      * Store the starting time of the current async operation.
      */
     unsigned long asyncOperationStart;
-    
+
     unsigned char lookupMacTransmitError(const char* error);
     unsigned char onMacRX();
     unsigned short readLn(char* buf, unsigned short bufferSize, unsigned short start = 0);
@@ -222,33 +262,33 @@ class MicrochipLoRaModem: public LoRaModem
      * Try to read the string on the input 1 time.
      */
     char tryReadString(const char* str);
-    
+
     /**
      * Try to read the string from teh input until found or untill timeout, do this async, so call many times.
      */
     char expectStringAsync(const char* str, unsigned short timeout);
-    
+
     bool setMacParam(const char* paramName, const unsigned char* paramValue, unsigned short size);
     bool setMacParam(const char* paramName, unsigned char paramValue);
     bool setMacParam(const char* paramName, const char* paramValue);
-    
+
     /**
      * Send and wait for response.
      */
-    unsigned char macTransmit(const char* type, const unsigned char* payload, unsigned char size);
-    
+    unsigned char macTransmit(const char* type, const unsigned char* payload, unsigned char size, uint8_t port);
+
     /**
      * Send command.
      */
-    void macSendCommand(const char* type, const unsigned char* payload, unsigned char size);
-    
+    void macSendCommand(const char* type, const unsigned char* payload, unsigned char size, uint8_t port);
+
     /**
      * Convert the text value for spreading factor into a number between 0 and 6.
      */
     int sfToIndex(char* value);
-    
+
     unsigned char macTransmitGetResponse();
-    
+
     /**
      * Checks the current input string against the param. Returns true if they match.
      */

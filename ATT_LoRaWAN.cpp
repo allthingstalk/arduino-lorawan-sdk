@@ -20,6 +20,7 @@
  */
 
 #include <ATT_LoRaWAN.h>
+#include <StringLiterals.h>
 #include "Utils.h"
 //#include <arduino.h>  // still required for the 'delay' function
 
@@ -35,11 +36,30 @@ ATTDevice::ATTDevice(LoRaModem* modem, Stream* monitor, bool autoCalMinTime, uns
 // connect with the to the lora gateway
 bool ATTDevice::initABP(const uint8_t* devAddress, const uint8_t* appsKey, const uint8_t* nwksKey, bool adr)
 {
-  _devAddress = devAddress;
-  _appsKey = appsKey;
-  _nwksKey = nwksKey;
+  return init(STR_ACTIVATION_ABP, devAddress, nwksKey, appsKey, adr);
+}
+
+bool ATTDevice::initOTAA(const uint8_t* devEUI, const uint8_t* appsEUI, const uint8_t* appKey, bool adr)
+{
+  return init(STR_ACTIVATION_OTAA, devEUI, appsEUI, appKey, adr);
+}
+
+bool ATTDevice::init(const char* activation, const uint8_t* dev, const uint8_t* ntwKeyOrAppEUI, const uint8_t* appsKey, bool adr)
+{
+  if (activation == STR_ACTIVATION_ABP) {
+	  _devAddress = dev;
+	  _nwksKey = ntwKeyOrAppEUI;
+	  _appsKey = appsKey;
+  }
+  else {
+	  _devEUI = dev;
+	  _appsEUI = ntwKeyOrAppEUI;
+	  _appKey = appsKey;
+  }
   
-  if(!hasKeys())
+  _activation = activation;
+  
+  if(!hasKeys(activation))
   {
     PRINTLN("Program stopped");
     while(1);
@@ -48,25 +68,43 @@ bool ATTDevice::initABP(const uint8_t* devAddress, const uint8_t* appsKey, const
   _adr = adr;
   PRINT("ATT lib version: "); PRINTLN(VERSION);
 
-  return checkInitStatus();
+  return checkInitStatus(activation);
 }
 
-bool ATTDevice::hasKeys()
+bool ATTDevice::hasKeys(const char* activation)
 {
   // check if keys are filled in
   int sum[3] = {0,0,0};
-  for(int i=0; i<sizeof(_devAddress); i++)
-  {
-    sum[0] += _devAddress[i];
+  if (activation == STR_ACTIVATION_ABP) {
+	  for(int i=0; i<sizeof(_devAddress); i++)
+	  {
+		sum[0] += _devAddress[i];
+	  }
+	  for(int i=0; i<sizeof(_appsKey); i++)
+	  {
+		sum[1] += _appsKey[i];
+	  }
+	  for(int i=0; i<sizeof(_nwksKey); i++)
+	  {
+		sum[2] += _nwksKey[i];
+	  }
   }
-  for(int i=0; i<sizeof(_appsKey); i++)
-  {
-    sum[1] += _appsKey[i];
+  else {
+	  for(int i=0; i<sizeof(_devEUI); i++)
+	  {
+		sum[0] += _devEUI[i];
+	  }
+	  for(int i=0; i<sizeof(_appKey); i++)
+	  {
+		sum[1] += _appKey[i];
+	  }
+	  for(int i=0; i<sizeof(_appsEUI); i++)
+	  {
+		sum[2] += _appsEUI[i];
+	  }
   }
-  for(int i=0; i<sizeof(_nwksKey); i++)
-  {
-    sum[2] += _nwksKey[i];
-  }
+  
+  
   if(sum[0] == 0 || sum[1] == 0 || sum[2] == 0){
     PRINTLN("Please fill in DEV_ADDR, APPSKEY and NWKSKEY in your keys.h file");
     return false;
@@ -75,7 +113,7 @@ bool ATTDevice::hasKeys()
   return true;
 }
 
-bool ATTDevice::checkInitStatus()
+bool ATTDevice::checkInitStatus(const char* activation)
 {
   if(!_modem->stop())  // stop any previously running modems
   {
@@ -87,19 +125,43 @@ bool ATTDevice::checkInitStatus()
     PRINTLN("Can't set adr: possible hardware issues?");
     return false;
   }
-  if(!_modem->setDevAddress(_devAddress)){
-    PRINTLN("Can't assign device address to modem: possible hardware issues?");
-    return false;
+  
+  if (activation == STR_ACTIVATION_ABP) {
+	if(!_modem->setDevAddress(_devAddress)){
+		PRINTLN("Can't assign device address to modem: possible hardware issues?");
+		return false;
+	}
+	
+	if(!_modem->setNWKSKey(_nwksKey)){
+		PRINTLN("Can't assign network session key to modem: possible hardware issues?");
+		return false;
+	}
+	
+	if(!_modem->setAppsKey(_appsKey)){
+		PRINTLN("Can't assign app session key to modem: possible hardware issues?");
+		return false;
+	}
   }
-  if(!_modem->setAppsKey(_appsKey)){
-    PRINTLN("Can't assign app session key to modem: possible hardware issues?");
-    return false;
+  else {
+	  if(!_modem->setDevEUI(_devEUI)){
+		PRINTLN("Can't assign device EUI to modem: possible hardware issues?");
+		return false;
+	  }
+	
+	  if (!_modem->setAppEUI(_appsEUI)){
+		  PRINTLN("Can't assign apps EUI to modem: possible hardware issues?");
+		return false;
+	  }
+	  
+	  if(!_modem->setAppKey(_appKey)){
+		PRINTLN("Can't assign app key to modem: possible hardware issues?");
+		return false;
+	  }
   }
-  if(!_modem->setNWKSKey(_nwksKey)){
-    PRINTLN("Can't assign network session key to modem: possible hardware issues?");
-    return false;
-  }
-  bool result = _modem->start();  // start up the modem
+  
+  
+  
+  bool result = _modem->start(activation);  // start up the modem
   if(result == true){
     PRINTLN("Modem initialized");
   }
@@ -124,8 +186,10 @@ bool ATTDevice::trySendFront()
 }
 
 // instruct the manager to try and send a message from the queue (if there are any)
-int ATTDevice::processQueue()
+int ATTDevice::processQueue(uint8_t port)
 {
+	_port = port;
+	
   //PRINTLN(_modem->isFree())
   bool sendResult = false;
   if(_modem->isFree() == true)
@@ -172,8 +236,8 @@ bool ATTDevice::addToQueue(void* packet, unsigned char size, bool ack)
   }
   else{
     push(packet, size, ack);
-    return sendASync(packet, size, ack);
-    //return true;
+    //return sendASync(packet, size, ack);
+    return true;
   }
 }
 
@@ -183,11 +247,11 @@ bool ATTDevice::sendASync(void* packet, unsigned char size, bool ack)
   float toa = _modem->calculateTimeOnAir(size);
   bool canSend = true;     // if the modem doesn't respond to the reconnect, don't try to send
   if(_sendFailed == true)  // restart the modem if a previous send had failed. This connects us back to the base station
-    canSend = checkInitStatus();
+    canSend = checkInitStatus(_activation);
 
   if(canSend){
     PRINT("TOA: ") PRINTLN(toa)
-    bool ackn = _modem->sendAsync(packet, size, ack);
+    bool ackn = _modem->sendAsync(packet, size, ack, _port);
     _lastTimeSent = millis();
     unsigned long minTime = ceil(toa * 100);  // dynamically adjust
     

@@ -54,11 +54,15 @@
 #define STR_APP_EUI "appeui "
 #define STR_APP_KEY "appkey "
 #define STR_ADR "adr "
+#define STR_DATARATE "dr "
 
 #define STR_CMD_JOIN "mac join "
 #define STR_OTAA "otaa"
 #define STR_ABP "abp"
 #define STR_ACCEPTED "accepted"
+
+#define STR_ACTIVATION_ABP "ABP"
+#define STR_ACTIVATION_OTAA "OTAA"
 
 #define STR_CMD_MAC_TX "mac tx "
 #define STR_CONFIRMED "cnf "
@@ -67,4 +71,3 @@
 #define STR_CMD_SLEEP "sys sleep 259200000" // 3 days
 
 #endif
-
