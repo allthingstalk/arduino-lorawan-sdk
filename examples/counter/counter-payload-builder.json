@@ -1,8 +1,0 @@
-{
-  "sense": [
-    {
-      "asset": "counter",
-      "value": {"byte": 0, "type": "integer"}
-    }
-  ]
-}

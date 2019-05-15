@@ -1,0 +1,28 @@
+{
+  "sense": [
+    {
+      "asset": "random",
+      "value": {
+        "byte": 0,
+        "bytelength": 4,
+        "type": "number"
+      }
+    },
+      {
+        "asset": "toggle",
+       	"value": {
+            "byte": 4,
+            "bytelength": 1,
+            "type": "boolean"
+        }
+      },
+      {
+        "asset": "message",
+       	"value": {
+            "byte": 5,
+            "bytelength": 5,
+            "type": "string"
+        }
+      }
+  ]
+}
