@@ -2,7 +2,7 @@
 
 # AllThingsTalk Arduino LoRaWAN SDK
 
-<img align="right" width="300" height="200" src="extras/lora-logo.png">
+<img align="right" width="200" height="200" src="extras/lora-logo.png">
 
 AllThingsTalk Arduino Library for LoRa Devices - makes connecting devices with [AllThingsTalk Maker](https://maker.allthingstalk.com/) a breeze.  
 
