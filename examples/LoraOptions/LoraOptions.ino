@@ -27,12 +27,19 @@
  * About this example
  ******************************************************************************
  *
- * In this example, we don't send any data to the AllThingsTalk Cloud. Instead,
- * we use the SDK capabilities to print out the data we can retrieve from the
- * LoRa modem.
+ * In this example we present LoraOptions, which can be used to handle LoRa
+ * specific metadata such as the uplink port, or message submission
+ * acknowledgment mode. Changing modem specific settings such as the spreading
+ * factor is presented as well.
+ *
+ * Before running the example, make sure that the LoRaWAN device is set up
+ * on Maker with appropriate keys, and that a string asset named "message"
+ * is present on the device.
  */
 
 #include <AllThingsTalk_LoRaWAN.h>
+
+#include "keys.h"
 
 // This example supports both Sodaq ONE & Sodaq Mbili.
 // The code below helps us discover which one it is.
@@ -46,34 +53,30 @@
 #endif
 #define loraSerial Serial1
 
-LoRaModem modem(loraSerial, debugSerial);
+ABPCredentials credentials(DEVADDR, APPSKEY, NWKSKEY);
+LoRaModem modem(loraSerial, debugSerial, credentials);
+CborPayload payload;
 
 void setup() {
   // We initialize the serial connection so that we can show debug information.
   debugSerial.begin(57600);
-  while (!debugSerial) {}
+  while ((!debugSerial)) {}
 
-  // We initialize the modem and print out all the information we can get from
-  // it using the serial connection.
-  if (modem.init()) {
-    debugSerial.println("------------------------------------------------------------");
-    debugSerial.print("Modem version: ");
-    debugSerial.println(modem.getModemVersion());
-    debugSerial.print("Frequency band: ");
-    debugSerial.println(modem.getFrequencyBand());
-    debugSerial.print("Adaptive data rate: ");
-    debugSerial.println(modem.getAdaptiveDataRate());
-    debugSerial.print("Data rate: ");
-    debugSerial.println(modem.getDataRate());
-    debugSerial.print("Modem status: ");
-    debugSerial.println(modem.getStatus());
-    debugSerial.print("Spreading factor: ");
-    debugSerial.println(modem.getSpreadingFactor());
-    debugSerial.print("Modulation mode: ");
-    debugSerial.println(modem.getModulationMode());
-    debugSerial.print("Operation frequency: ");
-    debugSerial.println(modem.getOperationFrequency());
+  // We initialize the modem.
+  if (!modem.init()) {
+    debugSerial.println("Could not initialize the modem. Check your keys.");
+    exit(0);
   }
+
+  // We set the lora options to port 4 with no acknowledgment.
+  LoRaOptions options(4, false);
+  modem.setOptions(options);
+  // And we set the spreading factor to 7.
+  modem.setSpreadingFactor(7);
+
+  // Finally, we send the message.
+  payload.set("message", "Hello LoRaOptions!");
+  modem.send(payload);
 }
 
 void loop() {

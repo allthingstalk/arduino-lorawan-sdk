@@ -27,12 +27,18 @@
  * About this example
  ******************************************************************************
  *
- * In this example, we don't send any data to the AllThingsTalk Cloud. Instead,
- * we use the SDK capabilities to print out the data we can retrieve from the
- * LoRa modem.
+ * In this example IoT datapoints are used to send temporal and positional
+ * metadata along with the device payload. You are going to need a Sodaq ONE or
+ * Sodaq Mbili board. No sensors required.
+ *
+ * Before running the example, make sure that the LoRaWAN device is set up
+ * on Maker with appropriate keys, that a number asset named "temperature"
+ * is present on the device, as well as a location asset named "loc".
  */
 
 #include <AllThingsTalk_LoRaWAN.h>
+
+#include "keys.h"
 
 // This example supports both Sodaq ONE & Sodaq Mbili.
 // The code below helps us discover which one it is.
@@ -46,34 +52,27 @@
 #endif
 #define loraSerial Serial1
 
-LoRaModem modem(loraSerial, debugSerial);
+ABPCredentials credentials(DEVADDR, APPSKEY, NWKSKEY);
+LoRaModem modem(loraSerial, debugSerial, credentials);
+CborPayload payload;
 
 void setup() {
-  // We initialize the serial connection so that we can show debug information.
   debugSerial.begin(57600);
-  while (!debugSerial) {}
+  while (!debugSerial);
 
-  // We initialize the modem and print out all the information we can get from
-  // it using the serial connection.
-  if (modem.init()) {
-    debugSerial.println("------------------------------------------------------------");
-    debugSerial.print("Modem version: ");
-    debugSerial.println(modem.getModemVersion());
-    debugSerial.print("Frequency band: ");
-    debugSerial.println(modem.getFrequencyBand());
-    debugSerial.print("Adaptive data rate: ");
-    debugSerial.println(modem.getAdaptiveDataRate());
-    debugSerial.print("Data rate: ");
-    debugSerial.println(modem.getDataRate());
-    debugSerial.print("Modem status: ");
-    debugSerial.println(modem.getStatus());
-    debugSerial.print("Spreading factor: ");
-    debugSerial.println(modem.getSpreadingFactor());
-    debugSerial.print("Modulation mode: ");
-    debugSerial.println(modem.getModulationMode());
-    debugSerial.print("Operation frequency: ");
-    debugSerial.println(modem.getOperationFrequency());
+  if (!modem.init()) {
+    exit(0);
   }
+
+  GeoLocation location(44.78659, 20.44890, 117);
+  long timestamp = 1500000000;
+
+  payload.reset();
+  payload.set("temperature", 23.5);
+  payload.setTimestamp(timestamp);
+  payload.setLocation(location);
+
+  modem.send(payload);
 }
 
 void loop() {

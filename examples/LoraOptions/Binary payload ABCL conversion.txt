@@ -1,0 +1,12 @@
+{
+  "sense": [
+    {
+      "asset": "Title",
+      "value": {
+        "byte": 0,
+        "bytelength": 5,
+        "type": "string"
+      }
+    }
+  ]
+}

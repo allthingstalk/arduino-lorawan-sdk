@@ -1,25 +1,55 @@
-# arduino-lorawan-sdk
 
-This is a SDK by AllThingsTalk that provides connectivity to their cloud through [LoRaWan radios](https://www.lora-alliance.org/What-Is-LoRa/Technology).
 
-### Version v2.2
+# AllThingsTalk Arduino LoRaWAN SDK
 
-What's new?
+AllThingsTalk Arduino Library for LoRa Devices - makes connecting devices with [AllThingsTalk Maker](https://maker.allthingstalk.com/) a breeze.  
 
-* Support for Ports when sending messages
-* Support OTAA
-* Support Actuation
-* Support for setting the Spreading factor
+> [AllThingsTalk](https://www.allthingstalk.com) is an accessible IoT Platform for rapid development.  
+In the blink of an eye, you'll be able to extract, visualize and use the collected data.  
+[Get started and connect up to 10 devices free-of-charge](https://www.allthingstalk.com/maker)
 
-### Version v2.1
+# Installing
 
-What's new?
+This library is available on Arduino Library Manager.  
+To download (or update), simply open your Arduino IDE, go to *Tools > Manage Libraries*, search for and install "*AllThingsTalk LoRaWAN SDK*".
 
-* Support for CBOR messages
+> In case you already have this SDK installed (from before it was available in Arduino Library Manager), please go to your "libraries" folder and delete (or backup) it before updating/installing it from Arduino Library Manager.
 
-## Hardware
+## Version History
 
-This SDK has been tested to work with the following hardware
+> **Note:** To avoid conflicts when updating, please remove or backup the old SDK version.
+
+### 3.1.0
+
+- Unified all libraries into a single "*AllThingsTalk_LoRaWAN.h*" (from now on, that's all you have to include to your sketch to use this SDK)
+- Updated all examples to use *AllThingsTalk_LoRaWAN.h*
+- Refined all [RDK](/examples/RDK) examples  (with comments on every line)
+- Added README files for all [RDK](/examples/RDK) examples
+
+### 3.0.0
+
+- Redesigned SDK structure
+- CBORPayload & BinaryPayload formalized
+- LoraOptions in downlink callbacks
+- Modem initialization simplified
+- Message queue management removed
+- Debug information extended
+- More examples
+
+### 2.2.0
+
+- Support for Ports when sending messages
+- Support OTAA
+- Support Actuation
+- Support for setting the Spreading factor
+
+### 2.1.0
+
+- Support for CBOR messages
+
+# Hardware
+
+This SDK has been tested to work with the following hardware:
 
 Chip
 - [Microchip](http://www.microchip.com/wwwproducts/Devices.aspx?product=RN2483) RN 2483
@@ -28,251 +58,171 @@ Board
 - Sodaq Mbili
 - Sodaq ONE
 
-## Installation
 
-Download the source code and copy the content of the zip file to your arduino libraries folder (usually found at /libraries) _or_ import the .zip file directly using the Arduino IDE.
+# Classes
 
-### Settings keys
+## Credentials
+New classes are introduced, like the credentials classes.  For LoRa you have two new classes, the ABP Credential class and the OTAA Credential class.  Both classes can be used as parameter voor the LoraModem (see _Modems_)
 
-Open the `keys.h` file and fill in your device credentials. You can copy paste them from your device at AllThingsTalk in the _SETTINGS > Connectivity_ tab.
+### ABP Credentials
+The ABP Credential class exists of one constructor with following parameters: Device Address, Application Session Key and Network Session Key.
+It also has the functions setDeviceAddress, setApplicationSessionKey, setNetworkSessionKey, getDeviceAddress, getApplicationSessionKey and getNetworkSessionKey.
+This class can be used as parameter for a Modem class
 
-For ABP
+### OTAA Credentials
+The OTAA Credential class exists also of one constructor with parameters like Device EUI, Application EUI and Application Key.
+Like the ABP Credentials class it also has function for setting and retrieving DeviceEUI, ApplicationEUI and ApplicationKey.
+Can also be used as parameter for a Modem class
+
+## Modems
+
+### LoRa Modem
+The *LoRaModem* class has one constructor with parameters like Hardware Serial and Credentials (see _Credentials_)
+Another important function is setOption, with this function you can set LoRaOptions like on which port you want to send data, which spreadingfactor and if you want to send data acknowledged or not.
+This class can also be used to get information from the modem, like status, version, datarate.
+
+#### Setting Options
 ```
-#ifndef KEYS_h
-#define KEYS_h
+LoRaOptions options;
+  
+options.port = 1;
+options.spreadingFactor = 7;
+options.ack = false;
 
-uint8_t DEV_ADDR[4] = {0x01, 0xD8, ..., ...};
-uint8_t APPSKEY[16] = {0x38, 0x4F, 0x94, 0x1B, 0x30, 0xFE, 0xF3, 0xF5, ..., ..., ..., 0x9A, 0x80, 0xC1, 0x9B, 0x3E};
-uint8_t NWKSKEY[16] = {0x66, 0x3F, 0xB3, 0x67, 0xFF, 0xE2, 0x4E, 0x71, ..., ..., ..., 0x2B, 0x24, 0xF1, 0x77, 0x45};
-
-#endif
+modem.setOptions(options);
 ```
-
-For OTAA
+*OR*
 ```
-#ifndef KEYS_h
-#define KEYS_h
-
-uint8_t DEV_EUI[8] = { 0x00, 0x6F, 0xF1, ..., ..., ..., 0xF6, 0xEA };
-uint8_t APPS_EUI[8] = { 0x70, 0xB3, 0xD5, ..., ..., ..., 0x37, 0x2D };
-uint8_t APP_KEY[16] = { 0x66, 0x58, 0xC5, 0x69, 0x81, 0xCC, 0xA2, ..., ..., ..., 0xDA, 0xC5, 0x80, 0xF5, 0x2E, 0x18 };
-
-#endif
+modem.setOptions(port); //will set port 
+modem.setOptions(port, spreadingFactor); //will set port and spreadingfactor
+modem.setOptions(port, ack); //will set port and acknowledgement
+modem.setOptions(port, ack, spreadingFactor); will set port, acknowledgement and spreadingfactor
 ```
-### Connecting
-
-The connection for ABP and OTAA is a little different.
-
-#### For ABP
+*OR you also can use following statements*
 ```
-MicrochipLoRaModem modem(&loraSerial, &debugSerial);
-ATTDevice device(&modem, &debugSerial, false, 7000);
-
-void setup()
-{
-  debugSerial.begin(SERIAL_BAUD);
-  while((!debugSerial) && (millis()) < 10000){}  // wait until the serial bus is available
-
-  loraSerial.begin(modem.getDefaultBaudRate());  // set baud rate of the serial connection to match the modem
-  while((!loraSerial) && (millis()) < 10000){}   // wait until the serial bus is available
-
-  while(!device.initABP(DEV_ADDR, APPSKEY, NWKSKEY));
-  debugSerial.println("Ready to send data");
-}
+modem.setPort(1);
+modem.setSpreadingFactor(9);
+modem.setAck(false);
 ```
 
-#### For OTAA
-```
-MicrochipLoRaModem modem(&loraSerial, &debugSerial);
-ATTDevice device(&modem, &debugSerial, false, 7000);
 
-void setup()
-{
-  debugSerial.begin(SERIAL_BAUD);
-  while((!debugSerial) && (millis()) < 10000){}  // wait until the serial bus is available
-
-  loraSerial.begin(modem.getDefaultBaudRate());  // set baud rate of the serial connection to match the modem
-  while((!loraSerial) && (millis()) < 10000){}   // wait until the serial bus is available
-
-  while(!device.initOTAA(DEV_EUI, APPS_EUI, APP_KEY, false));
-  debugSerial.println("Ready to send data");
-}
+#### Retrieving Modem Configuration
 
 ```
-
-### Payloads
-
-There are three ways to send your data to AllThingsTalk
-
-* `Standardized containers`
-* `Cbor payload`
-* `Binary payload`
-
-Containers will send a single datapoint to a single asset. Both _Cbor_ and _Binary_ allow you to construct your own payload. The former is slightly larger in size, the latter requires a small decoding file [(example)](https://github.com/allthingstalk/arduino-lorawan-sdk/blob/master/examples/counter/counter-payload-builder.json) on the receiving end.
-
-You can simply select the method you prefer by (un)commenting the methods at the start of the sketch.
-
-```
-// Select your preferred method of sending data
-//#define CONTAINERS
-#define CBOR
-//#define BINARY
+modem.getModemVersion();
+modem.getStatus();
+modem.getSpreadingFactor();
 ```
 
-#### Containers
+The `LoRa Modem` class can be used as parameter in the Device class.
 
-Send a single datapoint to a single asset using the `send(value, asset)` functions. Value can be any primitive type `integer`, `float`, `boolean` or `String`. For example
-
-```
-ATTDevice device(&modem, &debugSerial, false);
-Container container(device);
-```
-```
-  container.addToQueue(counter, INTEGER_SENSOR, false);
-```
-
-#### Cbor
+## Device
+This class has only one parameter in it's constructor and that's a parameter of type Modem.
+Class is used to send a payload to the modem. 
+You can also send the options for the specific modem
 
 ```
-ATTDevice device(&modem, &debugSerial, false);
-CborBuilder payload(device);  // Construct a payload object
-```
-```
-  payload.reset();
-  payload.map(1);  // Set number of datapoints in payload
-  payload.addInteger(25, "15");
-  payload.send();
+device.send(&payload);
+device.send(&payload, &options);
 ```
 
-#### Binary payload
+## Payload
 
-Using the [AllThingsTalk ABCL language](http://docs.allthingstalk.com/developers/custom-payload-conversion/), you can send a binary string containing datapoints of multiple assets in a single message. The example below shows how you can easily construct and send your own custom payload.
+### CBOR Payload
+This class is almost the same as the previous version, except you have now one function to update assets.
+```
+CBORPayload payload;
 
-> Make sure you set the correct decoding file at AllThingsTalk. Please check our documentation and the included experiments for examples.
-
-```
-ATTDevice device(&modem, &debugSerial, false);
-PayloadBuilder payload(device);  // Construct a payload object
-```
-```
-  payload.reset();
-  payload.addInteger(25);
-  payload.addNumber(false);
-  payload.addNumber(3.1415926);
-  payload.send();
+payload.map(3);
+payload.set("Battery", 39);
+payload.set("DoorOpen", true);
+payload.set("Temp", 24.5);
 ```
 
-### Examples
-
-Basic example showing all fundamental parts to set up a working example. Send data from the device, over NB-IoT to AllThingsTalk.
-
-* `counter` This example shows how you can send over a simple integer counter using either _json_, _cbor_ or a _binary payload_.
-
-Simply uncomment your selected method for sending data at the top of the sketch.
-
+Like mentioned before, you use the device class to send the payload
 ```
-// Uncomment your selected method for sending data
-#define CONTAINERS
-//#define CBOR
-//#define BINARY
+device.send(&payload);
 ```
 
-* `basicActuation` This examples shows you how can receive actuation messages
+*CBOR payload also supports tag 103 and 120*
 
-*On constrained devices, such as your class A LoraWAN device (https://www.thethingsnetwork.org/docs/lorawan/#end-devices), saving the energy is paramount. This is why the radio is mostly turned off, while the device itself spends time asleep. The downside to this is that you cannot receive actuations (downlink messages) at any time, but only in those short periods of time when the radio is listening. On class A devices, by standard, these short periods occur immediately after the radio sends a message. This is why we’re using a button in this example - to be able to trigger the radio and allow for downlink messages to arrive.*
+Tag 103 is automatically used when you add a Geolocation object (example GPSCBOR)
+```
+GeoLocation geoLocation(51.4546534, 4.127432, 11.2);
+    
+payload.map(1);
+payload.set("loc", &geoLocation);
 
+device.send(&payload);
+```
+
+Tag 120 is used when you set the timestamp (example iotDataPoint)
+```
+GeoLocation geoLocation(51.4546534, 4.127432, 11.2);
+    
+payload.map(4);
+payload.set("bat", 98);
+payload.set("title", "Hello Universe");
+payload.set("loc", &geoLocation);
+payload.set("doorClosed", true);
+payload.setTimestamp(138914018);
+
+device.send(&payload);
+```
+
+### Binary Payload
+Like in CBOR, the set functionality is almost the same, except you have to translate the incoming data your self via ABCL.  Examples given.
+```
+BinaryPayload payload;
+
+payload.set(17.56);
+payload.set(true);
+payload.set("hello");
+
+device.send(&payload);
+```
+OR
+
+```
+BinaryPayload payload01("Hello");
+BinaryPayload payload02("from ");
+
+device.send(&payload01);
+delay(5000);
+device.send(&payload02);
+
+```
+
+# Actuation
+You can also have actuation support in your sketch, the only thing you have to do is add following lines of code:
 ```
 void callback(const unsigned char* payload, unsigned int length, uint8_t port );
-MicrochipLoRaModem modem(&loraSerial, &debugSerial, callback);
-ATTDevice device(&modem, &debugSerial, false, 7000);
 
-bool sensorVal = false;
-bool prevButtonState = false;
+OTAACredentials credentials(DEVEUI, APPEUI, APPKEY);
+LoRaModem modem(&loraSerial, &debugSerial, &credentials, callback);
+Device device(&modem);
 
-void loop()
-{
-  bool sensorRead = digitalRead(digitalSensor);     // Read status Digital Sensor
-  if (sensorRead == 1 && prevButtonState == false)  // Verify if value has changed
-  {
-    prevButtonState = true;
-    debugSerial.println("Button pressed");
-    sendValue(!sensorVal);
-    sensorVal = !sensorVal;
-  }
-  else if(sensorRead == 0)
-    prevButtonState = false;
-}
-
-// callback function
-// handle messages that were sent from the AllThingsTalk cloud to this device
 void callback(const unsigned char* payload, unsigned int length, uint8_t port )
 {
-   String msgString;
-
-   char message_buff[length + 1];
-   strncpy(message_buff, (char*)payload, length);
-   message_buff[length] = '\0';
-   msgString = String(message_buff);
-
-   Serial.print("Payload: ");
-   Serial.println(msgString);
-
+  for (int i = 0; i < length; i++)
+  {
+    debugSerial.print(payload[i], HEX);
+  }
+  debugSerial.println();
 }
 ```
 
-* `instrumentation` Print out Modem parameters
+In the callback method you receive the payload that is sent from the backend.
 
-> When running the examples, make sure you select the correct hardware at the top of the sketch.
+**Parameters**
+payload: the binary data received from the backend
+length: total amounts of bytes in payload
+port: on which port you received the data
 
-```
-// Select your hardware
-#define SODAQ_MBILI
-//#define SODAQ_ONE
-```
+# Examples
 
-### Managing the queue
+For all the examples in the SDK, please keep in mind that:
 
-#### Without port number
-`processQueue()` will return a number based on the success of sending the message.
-In case of a failure (`-1`), you can remove the message from the queue if wanted using `pop()`.
-
-```
-sendState = device.processQueue();
-
-if(sendState == -1)
-{
-  debugSerial.println("Failed to send data; removing from queue");
-  device.pop();
-}
-
-```
-#### With port number
-You can also use  processQueue with a port number for saying I want to send data on that port.
-
-```
-sendState = device.processQueue(3);
-
-if(sendState == -1)
-{
-  debugSerial.println("Failed to send data; removing from queue");
-  device.pop();
-}
-
-```
-
-### ACK / Acknowledgement
-
-In all `addToQueue` functions, we can set an extra boolean parameter to enable or disable acknowledgements. By default this is set to _true_. We wait for a response so we are sure our message went through. If set to _false_, we do not wait for a response.
-
-```
-container.addToQueue(counter, INTEGER_SENSOR, false);  // don't wait for ACK
-```
-```
-payload.addToQueue(false);  // don't wait for ACK
-```
-
-# License
-Apache 2.0
-
-# Contributions
-Pull requests and new issues are welcome.
+* You have an account on AllThingsTalkMaker
+* Your device is created
+* An asset '*counter*' of type integer is made; for the Geolocation example, also create asset 'loc' of type 'Location'

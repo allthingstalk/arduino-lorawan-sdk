@@ -1,0 +1,47 @@
+ABPCredentials	KEYWORD2
+setDeviceAddress	KEYWORD2
+setApplicationSessionKey	KEYWORD2
+setNetworkSessionKey	KEYWORD2
+getDeviceAddress	KEYWORD2
+getApplicationSessionKey	KEYWORD2
+getNetworkSessionKey	KEYWORD2
+BinaryPayload	KEYWORD2
+CborPayload	KEYWORD2
+send	KEYWORD2
+LoRaOptions	KEYWORD2
+setOptions	KEYWORD2
+GeoLocation	KEYWORD2
+LoRaModem	KEYWORD2
+init	KEYWORD2
+setAck	KEYWORD2
+setSpreadingFactor	KEYWORD2
+setAdaptiveDataRate	KEYWORD2
+getSysParam	KEYWORD2
+getMacParam	KEYWORD2
+getRadioParam	KEYWORD2
+getHwEui	KEYWORD2
+getModemVersion	KEYWORD2
+getFrequencyBand	KEYWORD2
+getAdaptiveDataRate	KEYWORD2
+getDataRate	KEYWORD2
+getStatus	KEYWORD2
+getSpreadingFactor	KEYWORD2
+getModulationMode	KEYWORD2
+getOperationFrequency	KEYWORD2
+enableDevelopmentMode	KEYWORD2
+reset	KEYWORD2
+wakeUp	KEYWORD2
+sleep	KEYWORD2
+getDefaultBaudRate	KEYWORD2
+getMaxPayloadSize	KEYWORD2
+getLastErrorCode	KEYWORD2
+humanizeErrorCode	KEYWORD2
+Device	KEYWORD2
+setDeviceEUI	KEYWORD2
+setApplicationEUI	KEYWORD2
+setApplicationKey	KEYWORD2
+OTAACredentials	KEYWORD2
+
+
+
+
