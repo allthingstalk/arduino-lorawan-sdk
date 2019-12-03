@@ -39,9 +39,9 @@
 #define debugSerial     Serial                          // Define the serial interface that's going to be used for Serial monitor (debugging)
 #define loraSerial      Serial1                         // Define the serial interface that'll be used for communication with the LoRa module
 #define debugSerialBaud 57600                           // Define the baud rate for the debugging serial port (used for Serial monitor)
-#define sendEvery       300                             // Number of seconds between sensor readings
 
 float soundValue, lightValue, temperature, humidity, pressure, airValue;    // Variables used to store our sensor data
+unsigned int sendEvery = 300;                           // Creates a delay so the data is not constantly sent. 
 
 ABPCredentials credentials(DEVADDR, APPSKEY, NWKSKEY);  // Define the credential variables loaded from the keys.h file
 LoRaModem modem(loraSerial, debugSerial, credentials);  // Define LoRa modem properties
