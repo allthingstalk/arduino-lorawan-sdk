@@ -118,14 +118,11 @@ modem.getSpreadingFactor();
 
 The `LoRa Modem` class can be used as parameter in the Device class.
 
-## Device
-This class has only one parameter in it's constructor and that's a parameter of type Modem.
-Class is used to send a payload to the modem. 
-You can also send the options for the specific modem
+#### Sending data
+For sending payload data to the backend, we can use following statement:
 
 ```
-device.send(&payload);
-device.send(&payload, &options);
+modem.send(payload);
 ```
 
 ## Payload
