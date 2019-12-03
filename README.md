@@ -132,7 +132,7 @@ This class is almost the same as the previous version, except you have now one f
 ```
 CBORPayload payload;
 
-payload.map(3);
+payload.reset();
 payload.set("Battery", 39);
 payload.set("DoorOpen", true);
 payload.set("Temp", 24.5);
@@ -140,7 +140,7 @@ payload.set("Temp", 24.5);
 
 Like mentioned before, you use the device class to send the payload
 ```
-device.send(&payload);
+modem.send(payload);
 ```
 
 *CBOR payload also supports tag 103 and 120*
@@ -149,24 +149,24 @@ Tag 103 is automatically used when you add a Geolocation object (example GPSCBOR
 ```
 GeoLocation geoLocation(51.4546534, 4.127432, 11.2);
     
-payload.map(1);
+payload.reset();
 payload.set("loc", &geoLocation);
 
-device.send(&payload);
+modem.send(payload);
 ```
 
 Tag 120 is used when you set the timestamp (example iotDataPoint)
 ```
 GeoLocation geoLocation(51.4546534, 4.127432, 11.2);
     
-payload.map(4);
+payload.reset();
 payload.set("bat", 98);
 payload.set("title", "Hello Universe");
 payload.set("loc", &geoLocation);
 payload.set("doorClosed", true);
 payload.setTimestamp(138914018);
 
-device.send(&payload);
+modem.send(payload);
 ```
 
 ### Binary Payload
@@ -178,7 +178,7 @@ payload.set(17.56);
 payload.set(true);
 payload.set("hello");
 
-device.send(&payload);
+modem.send(payload);
 ```
 OR
 
@@ -186,26 +186,31 @@ OR
 BinaryPayload payload01("Hello");
 BinaryPayload payload02("from ");
 
-device.send(&payload01);
+modem.send(payload01);
 delay(5000);
-device.send(&payload02);
+modem.send(payload02);
 
 ```
 
 # Actuation
 You can also have actuation support in your sketch, the only thing you have to do is add following lines of code:
 ```
-void callback(const unsigned char* payload, unsigned int length, uint8_t port );
+void callback(BinaryPayload &payload, LoRaOptions &options);
 
 OTAACredentials credentials(DEVEUI, APPEUI, APPKEY);
-LoRaModem modem(&loraSerial, &debugSerial, &credentials, callback);
-Device device(&modem);
+LoRaModem modem(loraSerial, debugSerial, credentials);
 
-void callback(const unsigned char* payload, unsigned int length, uint8_t port )
+void setup() {
+  modem.setDownlinkCallback(callback)
+}
+
+void callback(BinaryPayload &payload, LoRaOptions &options);
 {
+  unsigned char* bytes = payload.getBytes();
+  int length = payload.getSize();
   for (int i = 0; i < length; i++)
   {
-    debugSerial.print(payload[i], HEX);
+    debugSerial.print(bytes[i], HEX);
   }
   debugSerial.println();
 }
@@ -215,8 +220,7 @@ In the callback method you receive the payload that is sent from the backend.
 
 **Parameters**
 payload: the binary data received from the backend
-length: total amounts of bytes in payload
-port: on which port you received the data
+options: LoRa option that were set
 
 # Examples
 
