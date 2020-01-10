@@ -133,24 +133,6 @@ bool LoRaModem::connect(OTAACredentials &otaaCredentials) {
     return expectOk() && expectAccepted(30000);
 }
 
-bool LoRaModem::enableDevelopmentMode() {
-    log("********************************************************************************");
-    log("WARNING! Enabling development mode. Duty cycle on all channels will be decreased");
-    log("         significantly. You are doing this on your responsibility.");
-    log("");
-    log("                          DO NOT USE THIS IN PRODUCTION");
-    log("********************************************************************************");
-    loraSerial->print("mac set ch dcycle 0 0\r\n");
-    loraSerial->print("mac set ch dcycle 1 0\r\n");
-    loraSerial->print("mac set ch dcycle 2 0\r\n");
-    for (auto i = 0; i < 3; ++i) {
-        if (!expectOk()) {
-            return false;
-        }
-    }
-    return true;
-}
-
 bool LoRaModem::reset(unsigned int retries) {
     log("Resetting the modem.");
     loraSerial->print("sys reset\r\n");

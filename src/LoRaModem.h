@@ -49,8 +49,6 @@ public:
     char *getModulationMode();
     char *getOperationFrequency();
 
-    bool enableDevelopmentMode();
-
     bool reset(unsigned int retries = 3);
     void wakeUp();
     void sleep(uint32_t milliseconds = 60000);
