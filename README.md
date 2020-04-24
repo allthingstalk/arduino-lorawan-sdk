@@ -17,38 +17,6 @@ To download (or update), simply open your Arduino IDE, go to *Tools > Manage Lib
 
 > In case you already have this SDK installed (from before it was available in Arduino Library Manager), please go to your "libraries" folder and delete (or backup) it before updating/installing it from Arduino Library Manager.
 
-## Version History
-
-> **Note:** To avoid conflicts when updating, please remove or backup the old SDK version.
-
-### 3.1.0
-
-- Unified all libraries into a single "*AllThingsTalk_LoRaWAN.h*" (from now on, that's all you have to include to your sketch to use this SDK)
-- Updated all examples to use *AllThingsTalk_LoRaWAN.h*
-- Refined all [RDK](/examples/RDK) examples  (with comments on every line)
-- Added README files for all [RDK](/examples/RDK) examples
-
-### 3.0.0
-
-- Redesigned SDK structure
-- CBORPayload & BinaryPayload formalized
-- LoraOptions in downlink callbacks
-- Modem initialization simplified
-- Message queue management removed
-- Debug information extended
-- More examples
-
-### 2.2.0
-
-- Support for Ports when sending messages
-- Support OTAA
-- Support Actuation
-- Support for setting the Spreading factor
-
-### 2.1.0
-
-- Support for CBOR messages
-
 # Hardware
 
 This SDK has been tested to work with the following hardware:
