@@ -42,10 +42,12 @@
 
 float soundValue, lightValue, temperature, humidity, pressure, airValue;    // Variables used to store our sensor data
 unsigned int sendEvery = 300;                           // Creates a delay so the data is not constantly sent. 
+uint8_t sensorType;                                     // Determines tph sensor type
 
 ABPCredentials credentials(DEVADDR, APPSKEY, NWKSKEY);  // Define the credential variables loaded from the keys.h file
 LoRaModem modem(loraSerial, debugSerial, credentials);  // Define LoRa modem properties
-Adafruit_BME280 tph;                                    // Create an "tph" object which will be our TPH (Temperature, Pressure and Humidity) sensor
+Adafruit_BME280 tph1;                                   // Create an "tph" object which will be our TPH (Temperature, Pressure and Humidity) sensor
+BME280 tph2;
 CborPayload payload;                                    // Create an object for our cbor payload which will be used to send data to AllThingsTalk
 
 void setup() {                                          // This function runs only at boot and only once.
@@ -57,7 +59,20 @@ void setup() {                                          // This function runs on
   pinMode(SoundSensorPin, INPUT);                       // Initialize the Sound Sensor pin as INPUT, so we can read the data
   pinMode(AirQualityPin, INPUT);                        // Initialize the Air Quality (Gas) Sensor pin as INPUT so we can read the data
   pinMode(LightSensorPin, INPUT);                       // Initialize the Light Sensor pin as INPUT, so we can read the data
-  tph.begin();                                          // Begin the i2c connection for the BME280 sensor (the Temperature, Pressure and Humidity Sensor)
+  initTphSensor();                                      // Begin the i2c connection for the BME280 sensor (the Temperature, Pressure and Humidity Sensor)
+}
+
+void initTphSensor() {
+  if (tph1.begin()) {
+    // Sensor will use Adafruit Library
+    sensorType = 1;
+  } else if (tph2.init()) {
+    // Sensor will use Seeed Library
+    sensorType = 2;
+  } else {    
+    debugSerial.println("Could not initialize TPH sensor, please check wiring");
+    exit(0);
+  }
 }
 
 void readSensors() {                                    // Function that we'll call when we want to read the data from all sensors
@@ -66,9 +81,17 @@ void readSensors() {                                    // Function that we'll c
   lightValue  = analogRead(LightSensorPin);             // Read the data from the Light Sensor pin and save it into the "lightValue" variable
   lightValue  = lightValue * 3.3 / 1023;                // Convert the light value to lux based on the voltage that the sensor receives (3.3 volts)
   lightValue  = pow(10, lightValue);                    // Light value (converted to lux) raised to power of 10
-  temperature = tph.readTemperature();                  // Read the temperature data from the BME280 (TPH) Sensor and save it into the "temperature" variable
-  humidity    = tph.readHumidity();                     // Read the humidity data from the BME280 (TPH) Sensor and save it into the "humidity" variable
-  pressure    = tph.readPressure()/100.0;               // Read the pressure data from the BME280 (TPH) Sensor, divide it by 100 and save it into the "pressure" variable
+
+  if (sensorType == 1) {
+    temperature = tph1.readTemperature();               // Read the temperature data from the BME280 (TPH) Sensor and save it into the "temperature" variable
+    humidity    = tph1.readHumidity();                  // Read the humidity data from the BME280 (TPH) Sensor and save it into the "humidity" variable
+    pressure    = tph1.readPressure()/100.0;            // Read the pressure data from the BME280 (TPH) Sensor, divide it by 100 and save it into the "pressure" variable
+  }
+  else {
+    temperature = tph2.getTemperature();                // Read the temperature data from the BME280 (TPH) Sensor and save it into the "temperature" variable
+    humidity    = tph2.getHumidity();                   // Read the humidity data from the BME280 (TPH) Sensor and save it into the "humidity" variable
+    pressure    = tph2.getPressure()/100.0;             // Read the pressure data from the BME280 (TPH) Sensor, divide it by 100 and save it into the "pressure" variable
+  }
 }
 
 void sendSensorValues() {                               // Function used to send the data we collected from all the sensors
