@@ -32,7 +32,7 @@
 #include "keys.h"                                       // Load the header file that contains your credentials for LoRaWAN
 #include <Wire.h>                                       // Library used for I2C communication
 #include "Adafruit_BME280.h"                            // Adafruit's library for the BME280 Humidity, Temperature and Pressure sensor7
-#include "Seeed_BME280.h"
+#include "Seeed_BME280.h"								// Seed library for the BME280 Humidity, Temperature and Pressure sensor7
 
 #define AirQualityPin   A0                              // Pin number to which our Air Quality (gas) sensor is connected to
 #define LightSensorPin  A2                              // Pin number to which our Light Sensor is connected to
