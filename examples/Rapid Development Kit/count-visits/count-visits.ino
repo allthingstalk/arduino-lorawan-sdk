@@ -4,7 +4,7 @@
  * /_/ \_\_|_| |_| |_||_|_|_||_\__, /__/ |_|\__,_|_|_\_\ |___/___/|_|\_\
  *                             |___/
  *
- * Copyright 2019 AllThingsTalk
+ * Copyright 2020 AllThingsTalk
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * limitations under the License.
  * 
  * ------- About This Example -------
- * If you didn't read the guide on AllThingsTalk Docs,
- * please do so at: https://docs.allthingstalk.com/examples/kits/lorawan-rdk/sodaq-mbili-count-visits/
+ * If you didn't read the guide on AllThingsTalk Knowledge Center,
+ * please do so at: https://www.allthingstalk.com/faq/getting-started-with-the-lorawan-rapid-development-kit
  *
  * Uses a reed switch to check when the door opens, waits for the door to close and then increments the 
  * number of visits and uploads that data to AllThingsTalk. Also uses a momentary push button which, 

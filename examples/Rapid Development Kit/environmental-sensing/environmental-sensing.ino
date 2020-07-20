@@ -4,7 +4,7 @@
  * /_/ \_\_|_| |_| |_||_|_|_||_\__, /__/ |_|\__,_|_|_\_\ |___/___/|_|\_\
  *                             |___/
  *
- * Copyright 2019 AllThingsTalk
+ * Copyright 2020 AllThingsTalk
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * limitations under the License.
  * 
  * ------- About This Example -------
- * If you didn't read the guide on AllThingsTalk Docs,
- * please do so at: https://docs.allthingstalk.com/examples/kits/lorawan-rdk/sodaq-mbili-environmental-sensing/
+ * If you didn't read the guide on AllThingsTalk Knowledge Center,
+ * please do so at: https://www.allthingstalk.com/faq/getting-started-with-the-lorawan-rapid-development-kit
  * 
  * This experiment shows how LoRa can be used to monitor the quality of
  * your surrounding environment. Measure in and outdoor air quality, noise
@@ -32,7 +32,7 @@
 #include "keys.h"                                       // Load the header file that contains your credentials for LoRaWAN
 #include <Wire.h>                                       // Library used for I2C communication
 #include "Adafruit_BME280.h"                            // Adafruit's library for the BME280 Humidity, Temperature and Pressure sensor7
-#include "Seeed_BME280.h"								// Seed library for the BME280 Humidity, Temperature and Pressure sensor7
+#include "Seeed_BME280.h"                               // Seed library for the BME280 Humidity, Temperature and Pressure sensor7
 
 #define AirQualityPin   A0                              // Pin number to which our Air Quality (gas) sensor is connected to
 #define LightSensorPin  A2                              // Pin number to which our Light Sensor is connected to
