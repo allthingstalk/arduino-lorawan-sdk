@@ -31,8 +31,8 @@
 #include <AllThingsTalk_LoRaWAN.h>                      // Load the AllThingsTalk LoRaWAN SDK
 #include "keys.h"                                       // Load the header file that contains your credentials for LoRaWAN
 #include <Wire.h>                                       // Library used for I2C communication
-#include "Adafruit_BME280.h"                            // Adafruit's library for the BME280 Humidity, Temperature and Pressure sensor7
-#include "Seeed_BME280.h"                               // Seed library for the BME280 Humidity, Temperature and Pressure sensor7
+#include "Adafruit_BME280.h"                            // Adafruit's library for the BME280 Humidity, Temperature and Pressure sensor
+#include "Seeed_BME280.h"                               // Seed library for the BME280 Humidity, Temperature and Pressure sensor
 
 #define AirQualityPin   A0                              // Pin number to which our Air Quality (gas) sensor is connected to
 #define LightSensorPin  A2                              // Pin number to which our Light Sensor is connected to
@@ -71,8 +71,8 @@ void initTphSensor() {
     // Sensor will use Seeed Library
     sensorType = 2;
   } else {    
-    debugSerial.println("Could not initialize TPH sensor, please check wiring");
-    exit(0);
+    debugSerial.println("Could not initialize TPH sensor, please check wiring.");
+    sensorType = 0;
   }
 }
 
@@ -87,11 +87,15 @@ void readSensors() {                                    // Function that we'll c
     temperature = tph1.readTemperature();               // Read the temperature data from the BME280 (TPH) Sensor and save it into the "temperature" variable
     humidity    = tph1.readHumidity();                  // Read the humidity data from the BME280 (TPH) Sensor and save it into the "humidity" variable
     pressure    = tph1.readPressure()/100.0;            // Read the pressure data from the BME280 (TPH) Sensor, divide it by 100 and save it into the "pressure" variable
-  }
-  else {
+  } else if (sensorType == 2) {
     temperature = tph2.getTemperature();                // Read the temperature data from the BME280 (TPH) Sensor and save it into the "temperature" variable
     humidity    = tph2.getHumidity();                   // Read the humidity data from the BME280 (TPH) Sensor and save it into the "humidity" variable
     pressure    = tph2.getPressure()/100.0;             // Read the pressure data from the BME280 (TPH) Sensor, divide it by 100 and save it into the "pressure" variable
+  } else {
+    temperature = 0;
+    humidity = 0;
+    pressure = 0;
+    debugSerial.println("TPH Sensor seems to be disconnected. Temperature/Humidity/Pressure Values sent will be 0.");
   }
 }
 
