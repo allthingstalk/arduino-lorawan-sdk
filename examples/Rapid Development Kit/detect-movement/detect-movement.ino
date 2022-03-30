@@ -7,7 +7,7 @@
 #define debugSerialBaud 57600                           // Define the baud rate for the debugging serial port (used for Serial monitor)
 
 bool pirValue;
-unsigned int sendEvery = 200;                            // Creates a delay so the data is not constantly sent. 
+bool previousPirValue;
 
 ABPCredentials credentials(DEVADDR, APPSKEY, NWKSKEY);  // Define the credential variables loaded from the keys.h file (for ABP activation method)
 LoRaModem modem(loraSerial, debugSerial, credentials);  // Define LoRa modem properties
@@ -27,18 +27,28 @@ void loop() {
   // put your main code here, to run repeatedly:
   readSensors();
   sendSensorValues();
-  delay(sendEvery*1000);
 }
 
 void readSensors() {                                    // Name of our function that we'll call from the loop function below
-  pirValue  = analogRead(PIRSensPin);                   // Read the data from the PIR Sensor pin and save it into the "pirValue" variable
-
+  delay(1000);
+  
+  pirValue = analogRead(PIRSensPin);                   // Read the data from the PIR Sensor pin and save it into the "pirValue" variable
+  
   debugSerial.println("-----------------------");
-  debugSerial.print("PIR VALUE: ");
+  debugSerial.print("PIR Value: ");
   debugSerial.print(pirValue);
   debugSerial.println("");
+
+  if (pirValue != previousPirValue) {
+      if (pirValue) {
+        debugSerial.println("Motion detected!");
+      } else {
+        debugSerial.println("Motion expired.");
+      }
   
-  delay(200);
+    sendSensorValues();
+    previousPirValue = pirValue;
+  }
 }
 
 void sendSensorValues() {                               // Function used to send the data we collected from all the sensors
